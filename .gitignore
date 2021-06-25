@@ -3,6 +3,7 @@ __pycache__
 /.eggs
 *.pyc
 gomock_reflect_*
+/.env
 /.vscode
 /*.crt
 /*.key
