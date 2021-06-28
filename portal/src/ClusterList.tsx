@@ -12,6 +12,7 @@ import {
   mergeStyleSets,
   TooltipHost,
   TextField,
+  Link,
 } from "@fluentui/react"
 import {
   DetailsList,
@@ -132,7 +133,45 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         key: "name",
         name: "Name",
         fieldName: "name",
-        minWidth: 210,
+        minWidth: 100,
+        maxWidth: 250,
+        isRowHeader: true,
+        isResizable: true,
+        isSorted: true,
+        isSortedDescending: false,
+        
+        sortAscendingAriaLabel: "Sorted A to Z",
+        sortDescendingAriaLabel: "Sorted Z to A",
+        onColumnClick: this._onColumnClick,
+        data: "string",
+        onRender: (item: ICluster) => (
+          <Link href={item.name + `info`}>
+            {item.name}
+          </Link>
+        ),
+        isPadded: true,
+      },
+      {
+        key: "subscription",
+        name: "Subscription",
+        fieldName: "subscription",
+        flexGrow: 1,
+        minWidth: 0.25,
+        isRowHeader: true,
+        isResizable: true,
+        isSorted: true,
+        isSortedDescending: false,
+        sortAscendingAriaLabel: "Sorted A to Z",
+        sortDescendingAriaLabel: "Sorted Z to A",
+        onColumnClick: this._onColumnClick,
+        data: "string",
+        isPadded: true,
+      },
+      {
+        key: "state2",
+        name: "State",
+        fieldName: "state2",
+        minWidth: 80,
         isRowHeader: true,
         isResizable: true,
         isSorted: true,
