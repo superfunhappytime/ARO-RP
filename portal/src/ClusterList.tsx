@@ -29,6 +29,9 @@ import {AxiosResponse} from "axios"
 interface ICluster {
   key: string
   name: string
+  id: string
+  state: string
+  failed: string
 }
 
 const errorBarStyles: Partial<IMessageBarStyles> = {root: {marginBottom: 15}}
@@ -145,7 +148,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         onColumnClick: this._onColumnClick,
         data: "string",
         onRender: (item: ICluster) => (
-          <Link href={item.name + `info`}>
+          <Link href={item.id + `/info`}>
             {item.name}
           </Link>
         ),
@@ -168,9 +171,9 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         isPadded: true,
       },
       {
-        key: "state2",
+        key: "state",
         name: "State",
-        fieldName: "state2",
+        fieldName: "state",
         minWidth: 80,
         isRowHeader: true,
         isResizable: true,
@@ -179,6 +182,11 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         sortAscendingAriaLabel: "Sorted A to Z",
         sortDescendingAriaLabel: "Sorted Z to A",
         onColumnClick: this._onColumnClick,
+        onRender: (item: ICluster) => (
+          <Text>
+            {item.state}{item.failed && " - " + item.failed}
+          </Text>
+        ),
         data: "string",
         isPadded: true,
       },
