@@ -21,7 +21,7 @@ type AdminOpenShiftCluster struct {
 	Key          string `json:"key"`
 	Name         string `json:"name"`
 	Id           string `json:"id"`
-	State        string `json:"state2"`
+	State        string `json:"state"`
 	FailedState  string `json:"failedState"`
 	Subscription string `json:"subscription"`
 }
