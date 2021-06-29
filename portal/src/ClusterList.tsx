@@ -138,7 +138,6 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         name: "Name",
         fieldName: "name",
         minWidth: 100,
-        maxWidth: 600,
         flexGrow: 10,
         isRowHeader: true,
         isResizable: true,
@@ -160,7 +159,6 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         name: "Subscription",
         fieldName: "subscription",
         minWidth: 100,
-        maxWidth: 400,
         flexGrow: 10,
         isRowHeader: true,
         isResizable: true,
@@ -177,7 +175,6 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         name: "State",
         fieldName: "state",
         minWidth: 100,
-        maxWidth: 200,
         flexGrow: 5,
         isRowHeader: true,
         isResizable: true,
@@ -207,7 +204,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
           <Stack horizontal verticalAlign="center" className={classNames.iconContainer}>
             <TooltipHost content={`Prometheus`}>
               <IconButton
-                iconProps={{iconName: "BarChart4"}}
+                iconProps={{iconName: "BIDashboard"}}
                 aria-label="Prometheus"
                 href={item.name + `/prometheus`}
               />
@@ -220,6 +217,27 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
               />
             </TooltipHost>
             <KubeconfigButton clusterID={item.name} csrfToken={props.csrfToken} />
+            <TooltipHost content={`Geneva`}>
+              <IconButton
+                iconProps={{iconName: "Health"}}
+                aria-label="Geneva"
+                href={item.name + `/geneva`}
+              />
+            </TooltipHost>
+            <TooltipHost content={`Upgrade`}>
+              <IconButton
+                iconProps={{iconName: "Up"}}
+                aria-label="Prometheus"
+                href={item.name + `/upgrade`}
+              />
+            </TooltipHost>
+            <TooltipHost content={`Feature Flags`}>
+              <IconButton
+                iconProps={{iconName: "IconSetsFlag"}}
+                aria-label="Prometheus"
+                href={item.name + `/feature-flags`}
+              />
+            </TooltipHost>
           </Stack>
         ),
       },
@@ -247,7 +265,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
           selectionMode={SelectionMode.none}
           getKey={this._getKey}
           setKey="none"
-          layoutMode={DetailsListLayoutMode.justified}
+          layoutMode={DetailsListLayoutMode.fixedColumns}
           isHeaderVisible={true}
           onItemInvoked={this._onItemInvoked}
           styles={clusterListDetailStyles}
