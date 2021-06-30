@@ -12,12 +12,16 @@ import (
 )
 
 type AdminOpenShiftCluster struct {
-	Key          string `json:"key"`
-	Name         string `json:"name"`
-	Id           string `json:"id"`
-	State        string `json:"state"`
-	FailedState  string `json:"failedState"`
-	Subscription string `json:"subscription"`
+	Key           string `json:"key"`
+	Name          string `json:"name"`
+	Id            string `json:"id"`
+	State         string `json:"state"`
+	Version       string `json:"version"`
+	CreatedDate   string `json:"createdDate"`
+	ProvisionedBy string `json:"provisionedBy"`
+	FailedState   string `json:"failedState"`
+	Subscription  string `json:"subscription"`
+	ConsoleLink   string `json:"consoleLink"`
 }
 
 func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
@@ -42,12 +46,15 @@ func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
 			name = m[0][3]
 		}
 		clusters = append(clusters, &AdminOpenShiftCluster{
-			Key:          doc.ID,
-			Id:           doc.OpenShiftCluster.ID,
-			Name:         name,
-			Subscription: subscription,
-			State:        ps.String(),
-			FailedState:  fps.String(),
+			Key:           doc.ID,
+			Id:            doc.OpenShiftCluster.ID,
+			Name:          name,
+			Subscription:  subscription,
+			Version:       doc.OpenShiftCluster.Properties.ClusterProfile.Version,
+			CreatedDate:   doc.OpenShiftCluster.Properties.CreatedAt.String(),
+			ProvisionedBy: doc.OpenShiftCluster.Properties.ProvisionedBy,
+			State:         ps.String(),
+			FailedState:   fps.String(),
 		})
 	}
 
