@@ -51,6 +51,7 @@ interface ICluster {
   version: string
   createdDate: string
   provisionedBy: string
+  lastModified: string
   state: string
   failed: string
   consoleLink: string
@@ -195,6 +196,22 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         key: "version",
         name: "Version",
         fieldName: "version",
+        minWidth: 100,
+        flexGrow: 5,
+        isRowHeader: true,
+        isResizable: true,
+        isSorted: true,
+        isSortedDescending: false,
+        sortAscendingAriaLabel: "Sorted A to Z",
+        sortDescendingAriaLabel: "Sorted Z to A",
+        onColumnClick: this._onColumnClick,
+        data: "string",
+        isPadded: true,
+      },
+      {
+        key: "latestModified",
+        name: "Last Modified",
+        fieldName: "lastModified",
         minWidth: 100,
         flexGrow: 5,
         isRowHeader: true,
