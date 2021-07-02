@@ -28,6 +28,7 @@ type AdminOpenShiftCluster struct {
 	ProvisionedBy string `json:"provisionedBy"`
 	FailedState   string `json:"failedState"`
 	Subscription  string `json:"subscription"`
+	ResourceGroup string `json:"resourceGroup"`
 	ConsoleLink   string `json:"consoleLink"`
 }
 
@@ -51,9 +52,11 @@ func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
 		ps := doc.OpenShiftCluster.Properties.ProvisioningState
 		fps := doc.OpenShiftCluster.Properties.FailedProvisioningState
 		subscription := "Unknown"
+		resourceGroup := "Unknown"
 		name := "Unknown"
 		if m := re.FindAllStringSubmatch(doc.OpenShiftCluster.ID, -1); len(m) == 1 && len(m[0]) == 4 {
 			subscription = m[0][1]
+			resourceGroup = m[0][2]
 			name = m[0][3]
 		}
 		LastModified := "Unknown"
@@ -66,6 +69,7 @@ func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
 			Id:            doc.OpenShiftCluster.ID,
 			Name:          name,
 			Subscription:  subscription,
+			ResourceGroup: resourceGroup,
 			Version:       doc.OpenShiftCluster.Properties.ClusterProfile.Version,
 			CreatedDate:   doc.OpenShiftCluster.Properties.CreatedAt.String(),
 			LastModified:  LastModified,
