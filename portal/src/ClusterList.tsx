@@ -128,16 +128,19 @@ const clusterListDetailStyles: Partial<IDetailsListStyles> = {
 interface ClusterListControlProps {
   items: ICluster[]
   sshModalRef: MutableRefObject<any>
+  clusterDetailPanelRef: MutableRefObject<any>
   csrfToken: MutableRefObject<string>
 }
 
 class ClusterListControl extends Component<ClusterListControlProps, IClusterListState> {
   private _sshModal: MutableRefObject<any>
+  private _clusterDetailPanel: MutableRefObject<any>
 
   constructor(props: ClusterListControlProps) {
     super(props)
 
     this._sshModal = props.sshModalRef
+    this._clusterDetailPanel = props.clusterDetailPanelRef
 
     const columns: IColumn[] = [
       {
@@ -170,7 +173,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         onColumnClick: this._onColumnClick,
         data: "string",
         onRender: (item: ICluster) => (
-          <Link href={item.id + `/info`}>
+          <Link onClick={(_) => this._onClusterDetailPanelClick(item)} >
             {item.name}
           </Link>
         ),
@@ -389,6 +392,13 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
     }
   }
 
+  private _onClusterDetailPanelClick(item: any): void {
+    const panel = this._clusterDetailPanel
+    if (panel && panel.current) {
+      panel.current.LoadClusterDetailPanel(item)
+    }
+  }
+
   private _onItemInvoked(item: any): void {
     alert(`Item invoked: ${item.name}`)
   }
@@ -416,6 +426,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
 export function ClusterList(props: {
   csrfToken: MutableRefObject<string>
   sshBox: MutableRefObject<any>
+  clusterDetailPanel: MutableRefObject<any>
   loaded: string
 }) {
   const [data, setData] = useState<any>([])
@@ -491,6 +502,7 @@ export function ClusterList(props: {
         items={data}
         ref={state}
         sshModalRef={props.sshBox}
+        clusterDetailPanelRef={props.clusterDetailPanel}
         csrfToken={props.csrfToken}
       />
     </Stack>

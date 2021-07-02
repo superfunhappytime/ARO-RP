@@ -24,6 +24,7 @@ import {
 import {AxiosResponse} from "axios"
 import {useBoolean} from "@fluentui/react-hooks"
 import {SSHModal} from "./SSHModal"
+import {ClusterDetail} from "./ClusterDetail"
 import {ClusterList} from "./ClusterList"
 import {FetchInfo, ProcessLogOut} from "./Request"
 
@@ -91,6 +92,7 @@ function App() {
   const [fetching, setFetching] = useState("")
 
   const sshRef = useRef<typeof SSHModal | null>(null)
+  const clusterDetailPanelRef = useRef<typeof ClusterDetail | null>(null)
   const csrfRef = useRef<string>("")
 
   useEffect(() => {
@@ -194,10 +196,11 @@ function App() {
         <Stack styles={contentStackStyles}>
           <Stack.Item grow>{error && errorBar()}</Stack.Item>
           <Stack.Item grow>
-            <ClusterList csrfToken={csrfRef} sshBox={sshRef} loaded={fetching} />
+            <ClusterList csrfToken={csrfRef} sshBox={sshRef} clusterDetailPanel={clusterDetailPanelRef} loaded={fetching} />
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
+        <ClusterDetail csrfToken={csrfRef} ref={clusterDetailPanelRef} />
       </Stack>
     </>
   )
