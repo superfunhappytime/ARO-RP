@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, MutableRefObject, Component} from "react"
+import React, {useState, useEffect, useRef, MutableRefObject, Component, SyntheticEvent} from "react"
 import {
   Stack,
   IconButton,
@@ -24,9 +24,13 @@ import {
   IDetailsListStyles,
 } from "@fluentui/react/lib/DetailsList"
 
-import {FetchClusters} from "./Request"
+import {FetchClusters, FetchClusterInfo} from "./Request"
 import {KubeconfigButton} from "./Kubeconfig"
 import {AxiosResponse} from "axios"
+
+var currentName: string
+var currentSubscription: string
+var currentResourceGroup: string
 
 registerIcons({
   icons: {
@@ -47,6 +51,8 @@ registerIcons({
 interface ICluster {
   key: string
   name: string
+  subscription: string
+  resourceGroup : string
   id: string
   version: string
   createdDate: string
@@ -131,6 +137,12 @@ interface ClusterListControlProps {
   clusterDetailPanelRef: MutableRefObject<any>
   csrfToken: MutableRefObject<string>
 }
+function handleClickOnLink(ev: React.MouseEvent<unknown>) {
+  FetchClusterInfo(currentSubscription, currentResourceGroup, currentName).then(
+    function(result) {
+      console.log(result?.data)
+    })
+}
 
 class ClusterListControl extends Component<ClusterListControlProps, IClusterListState> {
   private _sshModal: MutableRefObject<any>
@@ -174,7 +186,11 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         data: "string",
         onRender: (item: ICluster) => (
           <Link onClick={(_) => this._onClusterDetailPanelClick(item)} >
+            {item.id}
             {item.name}
+            {currentName = item.name}
+            {currentSubscription = item.subscription}
+            {currentResourceGroup = item.resourceGroup}
           </Link>
         ),
         isPadded: true,
