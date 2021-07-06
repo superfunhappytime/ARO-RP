@@ -61,7 +61,7 @@ func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
 		}
 		LastModified := "Unknown"
 		if doc.OpenShiftCluster.SystemData.LastModifiedAt != nil {
-			LastModified = doc.OpenShiftCluster.SystemData.LastModifiedAt.String()
+			LastModified = doc.OpenShiftCluster.SystemData.LastModifiedAt.Format("2006-01-02 15:04:05")
 		}
 
 		clusters = append(clusters, &AdminOpenShiftCluster{
@@ -71,7 +71,7 @@ func (p *portal) clusters(w http.ResponseWriter, r *http.Request) {
 			Subscription:  subscription,
 			ResourceGroup: resourceGroup,
 			Version:       doc.OpenShiftCluster.Properties.ClusterProfile.Version,
-			CreatedDate:   doc.OpenShiftCluster.Properties.CreatedAt.String(),
+			CreatedDate:   doc.OpenShiftCluster.Properties.CreatedAt.Format("2006-01-02 15:04:05"),
 			LastModified:  LastModified,
 			ProvisionedBy: doc.OpenShiftCluster.Properties.ProvisionedBy,
 			State:         ps.String(),

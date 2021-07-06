@@ -20,7 +20,7 @@ type AdminOpenShiftClusterDocument struct {
 	LastModifiedBy          string               `json:"lastModifiedBy"`
 	LastModifiedAt          string               `json:"lastModifiedAt"`
 	Tags                    map[string]string    `json:"tags"`
-	ArchitectureVersion     int                  `json:"architectureVersion"`
+	ArchitectureVersion     string               `json:"architectureVersion"`
 	ProvisioningState       string               `json:"provisioningState"`
 	LastProvisioningState   string               `json:"lastProvisioningState"`
 	FailedProvisioningState string               `json:"failedProvisioningState"`
@@ -32,14 +32,11 @@ type AdminOpenShiftClusterDocument struct {
 	WorkerProfiles          []api.WorkerProfile  `json:"workerProfile,omitempty"`
 	ApiServerProfile        api.APIServerProfile `json:"apiServer,omitempty"`
 	IngressProfiles         []api.IngressProfile `json:"ingressProfiles,omitempty"`
-	Install                 api.Install          `json:"install,omitempty"`
+	Install                 *api.Install         `json:"install,omitempty"`
 }
 
 func (p *portal) clusterInfo(w http.ResponseWriter, r *http.Request) {
-	// TODO: Replace dummy data with actual data collection from APIs and other resources
-	// ctx := r.Context()
-
-	// doc, err := p.dbOpenShiftClusters.Get(ctx, "/subscriptions/225e02bc-43d0-43d1-a01a-17e584a4ef69/resourcegroups/v4-eastus/providers/microsoft.redhatopenshift/openshiftclusters/mjudeikis2")
+	ctx := r.Context()
 
 	apiVars := mux.Vars(r)
 
@@ -49,85 +46,40 @@ func (p *portal) clusterInfo(w http.ResponseWriter, r *http.Request) {
 
 	resourceId := "/subscriptions/" + subscription + "/resourceGroups/" + resourceGroup + "/providers/Microsoft.RedHatOpenShift/openShiftClusters/" + clusterName
 
-	masterProfile := api.MasterProfile{
-		VMSize:   "Standard_D8s_v3",
-		SubnetID: "/subscriptions/225e02bc-43d0-43d1-a01a-17e584a4ef69/resourceGroups/v4-eastus/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/mjudeikis2-master",
+	doc, err := p.dbOpenShiftClusters.Get(ctx, resourceId)
+
+	createdAt := "Unknown"
+	if doc.OpenShiftCluster.SystemData.CreatedAt != nil {
+		createdAt = doc.OpenShiftCluster.SystemData.CreatedAt.Format("2006-01-02 15:04:05")
 	}
 
-	workerProfiles := []api.WorkerProfile{
-		{
-			VMSize:     "Standard_D2s_v3",
-			SubnetID:   "/subscriptions/225e02bc-43d0-43d1-a01a-17e584a4ef69/resourceGroups/v4-eastus/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/mjudeikis2-worker",
-			Name:       "workerProfile1",
-			DiskSizeGB: 64,
-			Count:      3,
-		},
-		{
-			VMSize:     "Standard_D4s_v5",
-			SubnetID:   "/subscriptions/225e02bc-43d0-43d1-a01a-17e584a4ef69/resourceGroups/v4-eastus/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/mjudeikis2-worker",
-			Name:       "workerProfile2",
-			DiskSizeGB: 128,
-			Count:      2,
-		},
-		{
-			VMSize:     "Standard_D6s_v7",
-			SubnetID:   "/subscriptions/225e02bc-43d0-43d1-a01a-17e584a4ef69/resourceGroups/v4-eastus/providers/Microsoft.Network/virtualNetworks/dev-vnet/subnets/mjudeikis2-worker",
-			Name:       "workerProfile3",
-			DiskSizeGB: 256,
-			Count:      1,
-		},
+	lastModifiedAt := "Unknown"
+	if doc.OpenShiftCluster.SystemData.CreatedAt != nil {
+		lastModifiedAt = doc.OpenShiftCluster.SystemData.LastModifiedAt.Format("2006-01-02 15:04:05")
 	}
-
-	apiServerProfile := api.APIServerProfile{
-		Visibility: "public",
-		URL:        "https://api.dyz4807n.v4-eastus.osadev.cloud:6443/",
-		IP:         "40.88.210.230",
-		IntIP:      "192.168.0.1",
-	}
-
-	ingressProfile := []api.IngressProfile{
-		{
-			Name:       "ingressProfile1",
-			Visibility: "Public",
-			IP:         "20.72.148.25",
-		},
-		{
-			Name:       "ingressProfile2",
-			Visibility: "Public",
-			IP:         "20.72.148.26",
-		},
-		{
-			Name:       "ingressProfile3",
-			Visibility: "Private",
-			IP:         "20.72.148.27",
-		},
-	}
-
-	// For installation of new clusters
-	// install := api.Install{
-	// 	Now:           time.Time{},
-	// 	Phase:         api.InstallPhaseBootstrap,
-	// }
 
 	clusterInfo := AdminOpenShiftClusterDocument{
-		ResourceID:            resourceId,
-		Name:                  clusterName,
-		Location:              "east-us",
-		CreatedBy:             "Ellis",
-		CreatedAt:             "01-01-0001",
-		LastModifiedBy:        "Ellis",
-		LastModifiedAt:        "02-07-2021",
-		Tags:                  make(map[string]string),
-		ArchitectureVersion:   1,
-		ProvisioningState:     "Succeeded",
-		LastProvisioningState: "Succeeded",
-		Version:               "4.5.17",
-		ConsoleLink:           "https://google.com",
-		InfraId:               "testing-infra",
-		MasterProfile:         masterProfile,
-		WorkerProfiles:        workerProfiles,
-		ApiServerProfile:      apiServerProfile,
-		IngressProfiles:       ingressProfile,
+		ResourceID:              resourceId,
+		Name:                    clusterName,
+		Location:                doc.OpenShiftCluster.Location,
+		CreatedBy:               doc.OpenShiftCluster.SystemData.CreatedBy,
+		CreatedAt:               createdAt,
+		LastModifiedBy:          doc.OpenShiftCluster.SystemData.LastModifiedBy,
+		LastModifiedAt:          lastModifiedAt,
+		Tags:                    doc.OpenShiftCluster.Tags,
+		ArchitectureVersion:     string(rune(doc.OpenShiftCluster.Properties.ArchitectureVersion)),
+		ProvisioningState:       doc.OpenShiftCluster.Properties.ProvisioningState.String(),
+		LastProvisioningState:   doc.OpenShiftCluster.Properties.LastProvisioningState.String(),
+		FailedProvisioningState: doc.OpenShiftCluster.Properties.FailedProvisioningState.String(),
+		LastAdminUpdateError:    doc.OpenShiftCluster.Properties.LastAdminUpdateError,
+		Version:                 doc.OpenShiftCluster.Properties.ClusterProfile.Version,
+		ConsoleLink:             doc.OpenShiftCluster.Properties.ConsoleProfile.URL,
+		InfraId:                 doc.OpenShiftCluster.Properties.InfraID,
+		MasterProfile:           doc.OpenShiftCluster.Properties.MasterProfile,
+		WorkerProfiles:          doc.OpenShiftCluster.Properties.WorkerProfiles,
+		ApiServerProfile:        doc.OpenShiftCluster.Properties.APIServerProfile,
+		IngressProfiles:         doc.OpenShiftCluster.Properties.IngressProfiles,
+		Install:                 doc.OpenShiftCluster.Properties.Install,
 	}
 
 	b, err := json.MarshalIndent(clusterInfo, "", "    ")
