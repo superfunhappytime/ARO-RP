@@ -138,6 +138,9 @@ interface ClusterListControlProps {
   csrfToken: MutableRefObject<string>
 }
 function handleClickOnLink(ev: React.MouseEvent<unknown>) {
+  // {currentName = item.name}
+  // {currentSubscription = item.subscription}
+  // {currentResourceGroup = item.resourceGroup}
   FetchClusterInfo(currentSubscription, currentResourceGroup, currentName).then(
     function(result) {
       console.log(result?.data)
@@ -186,11 +189,7 @@ class ClusterListControl extends Component<ClusterListControlProps, IClusterList
         data: "string",
         onRender: (item: ICluster) => (
           <Link onClick={(_) => this._onClusterDetailPanelClick(item)} >
-            {item.id}
             {item.name}
-            {currentName = item.name}
-            {currentSubscription = item.subscription}
-            {currentResourceGroup = item.resourceGroup}
           </Link>
         ),
         isPadded: true,
