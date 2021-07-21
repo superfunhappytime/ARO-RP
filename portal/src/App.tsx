@@ -24,7 +24,7 @@ import {
 import {AxiosResponse} from "axios"
 import {useBoolean} from "@fluentui/react-hooks"
 import {SSHModal} from "./SSHModal"
-import {ClusterDetail} from "./ClusterDetail"
+import {ClusterDetailPanel} from "./ClusterDetail"
 import {ClusterList} from "./ClusterList"
 import {FetchInfo, ProcessLogOut} from "./Request"
 
@@ -92,7 +92,7 @@ function App() {
   const [fetching, setFetching] = useState("")
 
   const sshRef = useRef<typeof SSHModal | null>(null)
-  const clusterDetailPanelRef = useRef<typeof ClusterDetail | null>(null)
+  const clusterDetailPanelRef = useRef<typeof ClusterDetailPanel | null>(null)
   const csrfRef = useRef<string>("")
 
   useEffect(() => {
@@ -200,7 +200,14 @@ function App() {
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
-        <ClusterDetail csrfToken={csrfRef} ref={clusterDetailPanelRef} />
+        <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} name={""} resourceGroup={""} subscription={""} ref={clusterDetailPanelRef}/> 
+        {/* ClusterDetailPanel should be moved into ClusterList 
+        --- loaded is a prop that stops the panel loading further data until 
+        main api has fetched api/info 
+        
+        when we move this component in... ref to error bar in clusterlist.. ? 
+        ... maybe not - no., actual not.. we want the error to appear in panel.
+        */}
       </Stack>
     </>
   )
