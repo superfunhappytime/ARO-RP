@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useCallback} from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import {
   Stack,
   Text,
@@ -21,17 +21,17 @@ import {
   MessageBarType,
   Icon,
 } from "@fluentui/react"
-import {AxiosResponse} from "axios"
-import {useBoolean} from "@fluentui/react-hooks"
-import {SSHModal} from "./SSHModal"
-import {ClusterDetail} from "./ClusterDetail"
-import {ClusterList} from "./ClusterList"
-import {FetchInfo, ProcessLogOut} from "./Request"
+import { AxiosResponse } from "axios"
+import { useBoolean } from "@fluentui/react-hooks"
+import { SSHModal } from "./SSHModal"
+import { ClusterDetailPanel } from "./ClusterDetail"
+import { ClusterList } from "./ClusterList"
+import { FetchInfo, ProcessLogOut } from "./Request"
 
 const containerStackTokens: IStackTokens = {}
-const appStackTokens: IStackTokens = {childrenGap: 10}
+const appStackTokens: IStackTokens = { childrenGap: 10 }
 
-const errorBarStyles: Partial<IMessageBarStyles> = {root: {marginBottom: 15}}
+const errorBarStyles: Partial<IMessageBarStyles> = { root: { marginBottom: 15 } }
 
 const stackStyles: IStackStyles = {
   root: [
@@ -48,13 +48,23 @@ const headerTextStyles: ITextStyles = {
   },
 }
 
-const contentStackStyles: IStackStyles = {
+const contentStackStylesNormal: IStackStyles = {
   root: [
     {
       padding: 20,
     },
   ],
 }
+
+const contentStackStylesSmall: IStackStyles = {
+  root: [
+    {
+      padding: 20,
+      width: "215px",
+    },
+  ],
+}
+
 
 const stackNavStyles: IStackStyles = {
   root: {
@@ -64,7 +74,7 @@ const stackNavStyles: IStackStyles = {
 }
 
 const MenuButtonStyles: IButtonStyles = {
-  icon: {color: DefaultPalette.white},
+  icon: { color: DefaultPalette.white },
 }
 
 const darkTheme: PartialTheme = {
@@ -85,15 +95,34 @@ const navPanelStyles: Partial<IPanelStyles> = {
   },
 }
 
-function App() {
-  const [data, updateData] = useState({location: "", csrf: "", elevated: false, username: ""})
-  const [error, setError] = useState<AxiosResponse | null>(null)
-  const [isOpen, {setTrue: openPanel, setFalse: dismissPanel}] = useBoolean(false)
-  const [fetching, setFetching] = useState("")
+export interface IClusterDetail {
+  subscription: string,
+  resource: string,
+  clusterName: string,
+}
 
+function App() {
+  const [data, updateData] = useState({ location: "", csrf: "", elevated: false, username: "" })
+  const [error, setError] = useState<AxiosResponse | null>(null)
+  const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
+  const [fetching, setFetching] = useState("")
+  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: ""} ) // TODO: probably not best practice ... nullable reference?
+
+  const [contentStackStyles, setContentStackStyles] = useState<IStackStyles>(contentStackStylesNormal)
   const sshRef = useRef<typeof SSHModal | null>(null)
-  const clusterDetailPanelRef = useRef<typeof ClusterDetail | null>(null)
   const csrfRef = useRef<string>("")
+
+  // _setCurrentCluster is a helper function to wrap app state
+  // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
+  const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
+    setCurrentCluster({ subscription: "", resource: "", clusterName: ""})
+    setCurrentCluster(clusterDetail)
+    setContentStackStyles(contentStackStylesSmall)
+  }
+
+  const _onCloseDetailPanel = () => {
+    setContentStackStyles(contentStackStylesNormal)
+  }
 
   useEffect(() => {
     const onData = (result: AxiosResponse | null) => {
@@ -115,7 +144,7 @@ function App() {
   const onRenderNavigationContent: IRenderFunction<IPanelProps> = useCallback(
     (props, defaultRender) => (
       <>
-        <IconButton iconProps={{iconName: "GlobalNavButton"}} onClick={dismissPanel} />
+        <IconButton iconProps={{ iconName: "GlobalNavButton" }} onClick={dismissPanel} />
       </>
     ),
     [dismissPanel]
@@ -139,6 +168,10 @@ function App() {
       </MessageBar>
     )
   }
+  
+  // Application state maintains the current resource id/name/group
+  // when we click a thing set the state
+  // ...
 
   return (
     <>
@@ -165,7 +198,7 @@ function App() {
           >
             <Stack.Item>
               <IconButton
-                iconProps={{iconName: "GlobalNavButton"}}
+                iconProps={{ iconName: "GlobalNavButton" }}
                 onClick={openPanel}
                 styles={MenuButtonStyles}
               />
@@ -186,7 +219,7 @@ function App() {
             </Stack.Item>
             <Stack.Item>
               <IconButton
-                iconProps={{iconName: "SignOut"}}
+                iconProps={{ iconName: "SignOut" }}
                 onClick={logOut}
                 styles={MenuButtonStyles}
               />
@@ -196,11 +229,13 @@ function App() {
         <Stack styles={contentStackStyles}>
           <Stack.Item grow>{error && errorBar()}</Stack.Item>
           <Stack.Item grow>
-            <ClusterList csrfToken={csrfRef} sshBox={sshRef} clusterDetailPanel={clusterDetailPanelRef} loaded={fetching} />
+            <ClusterList csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
+          </Stack.Item>
+          <Stack.Item grow>
+            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} onClose={_onCloseDetailPanel}/>
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
-        <ClusterDetail csrfToken={csrfRef} ref={clusterDetailPanelRef} />
       </Stack>
     </>
   )
