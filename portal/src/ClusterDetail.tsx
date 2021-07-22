@@ -58,8 +58,8 @@ const errorBarStyles: Partial<IMessageBarStyles> = { root: { marginBottom: 15 } 
 
 export function ClusterDetailPanel(props: {
   csrfToken: MutableRefObject<string>
-  currentCluster : IClusterDetail
-  loaded : string
+  currentCluster: IClusterDetail
+  loaded: string
 }) {
   const [data, setData] = useState<any>([])
   const [error, setError] = useState<AxiosResponse | null>(null)
@@ -107,23 +107,28 @@ export function ClusterDetailPanel(props: {
   useEffect(() => {
     const onData = (result: AxiosResponse | null) => {
       if (result?.status === 200) {
-        setData(result)
+        updateData(result.data)
       } else {
         setError(result)
       }
       setFetching("DONE")
     }
 
-    if (fetching === "" && props.loaded === "DONE"  && props.currentCluster.clusterName != "") {
-      // open the panel.. 
-      openPanel()
+    if (fetching === "" && props.loaded === "DONE") { // && props.currentCluster.clusterName == "") {
       setFetching("FETCHING")
       FetchClusterInfo(props.currentCluster.subscription, props.currentCluster.resource, props.currentCluster.clusterName).then(onData) // TODO: fetchClusterInfo accepts IClusterDetail
-    } else if (fetching === "" && props.currentCluster.clusterName === "") { //props.loaded === blank?
-      dismissPanel();
-      // close the panel
-    } // if panel is open and fetching ... shimmer or dot dot dot
-  }, [data, fetching, setFetching, props.currentCluster.clusterName, props.loaded]) 
+    }
+  }, [data, fetching, setFetching])
+
+
+  useEffect(() => {
+    if (props.currentCluster.clusterName != "") {
+      setData([])
+      setFetching("")
+      openPanel()
+    }
+  }, [props.currentCluster.clusterName])
+
   // TODO: props.loaded rename to CSRFTokenAvailable
 
   return (
