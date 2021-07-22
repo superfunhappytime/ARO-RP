@@ -26,22 +26,6 @@
                 "webpack:///src/*": "${webRoot}/*"
             },
         },
-        // {
-        //     "type": "firefox",
-        //     "request": "launch",
-        //     "name": "Launch Firefox against localhost",
-        //     "preLaunchTask": "start-dev-server",
-        //     "url": "https://localhost:3000",
-        //     "webRoot": "${workspaceFolder}"
-        // },
-        // {
-        //     "type": "pwa-chrome",
-        //     "request": "launch",
-        //     "name": "Launch Chrome against localhost",
-        //     //"preLaunchTask": "start-dev-server",
-        //     "url": "https://localhost:3000",
-        //     "webRoot": "${workspaceFolder}"
-        // },
         {
             "name": "Chrome",
             "type": "chrome",
