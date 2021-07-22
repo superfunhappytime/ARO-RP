@@ -85,15 +85,27 @@ const navPanelStyles: Partial<IPanelStyles> = {
   },
 }
 
+export interface IClusterDetail {
+  subscription: string,
+  resource: string,
+  clusterName: string,
+}
+
 function App() {
   const [data, updateData] = useState({ location: "", csrf: "", elevated: false, username: "" })
   const [error, setError] = useState<AxiosResponse | null>(null)
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
   const [fetching, setFetching] = useState("")
+  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: ""} ) // TODO: probably not best practice ... nullable reference?
 
   const sshRef = useRef<typeof SSHModal | null>(null)
-  const clusterDetailPanelRef = useRef<typeof ClusterDetailPanel | null>(null)
   const csrfRef = useRef<string>("")
+
+  // _setCurrentCluster is a helper function to wrap app state
+  // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
+  const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
+    setCurrentCluster(clusterDetail)
+  }
 
   useEffect(() => {
     const onData = (result: AxiosResponse | null) => {
@@ -139,6 +151,10 @@ function App() {
       </MessageBar>
     )
   }
+  
+  // Application state maintains the current resource id/name/group
+  // when we click a thing set the state
+  // ...
 
   return (
     <>
@@ -196,18 +212,21 @@ function App() {
         <Stack styles={contentStackStyles}>
           <Stack.Item grow>{error && errorBar()}</Stack.Item>
           <Stack.Item grow>
-            <ClusterList csrfToken={csrfRef} sshBox={sshRef} clusterDetailPanel={clusterDetailPanelRef} loaded={fetching} />
+            <ClusterList csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
+          </Stack.Item>
+          <Stack.Item grow>
+            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} />
+
+            {/* ClusterDetailPanel hidden
+              onclick in cluster list
+              hide
+              show panel
+
+              be happy.
+              */}
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
-        <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} name={""} resourceGroup={""} subscription={""} ref={clusterDetailPanelRef} />
-        {/* ClusterDetailPanel should be moved into ClusterList 
-        --- loaded is a prop that stops the panel loading further data until 
-        main api has fetched api/info 
-        
-        when we move this component in... ref to error bar in clusterlist.. ? 
-        ... maybe not - no., actual not.. we want the error to appear in panel.
-        */}
       </Stack>
     </>
   )

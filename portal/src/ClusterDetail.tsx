@@ -5,6 +5,7 @@ import React, { useState, useImperativeHandle, useEffect, Component, useRef, for
 import { IMessageBarStyles, MessageBar, MessageBarType } from '@fluentui/react';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
+import { IClusterDetail } from "./App"
 
 // does the controller need props?
 type ClusterDetailPanelProps = {
@@ -55,23 +56,16 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
 
 const errorBarStyles: Partial<IMessageBarStyles> = { root: { marginBottom: 15 } }
 
-export const ClusterDetailPanel = forwardRef<any, ClusterDetailPanelProps>(({ csrfToken, name, subscription, resourceGroup, loaded }, ref) => {
-
-  /*export function ClusterDetailPanel(props: {
-    csrfToken: MutableRefObject<string>
-    name : any
-    subscription : any
-    resourceGroup : any
-    loaded : string
-  
-  }) {*/
+export function ClusterDetailPanel(props: {
+  csrfToken: MutableRefObject<string>
+  currentCluster : IClusterDetail
+  loaded : string
+}) {
   const [data, setData] = useState<any>([])
   const [error, setError] = useState<AxiosResponse | null>(null)
   const state = useRef<ClusterDetailComponent>(null)
   const [fetching, setFetching] = useState("")
-
   const [resourceID, setResourceID] = useState("")
-
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false); // panel controls
 
   const errorBar = (): any => {
@@ -88,17 +82,17 @@ export const ClusterDetailPanel = forwardRef<any, ClusterDetailPanelProps>(({ cs
     )
   }
 
-  useImperativeHandle(ref, () => ({
-    LoadClusterDetailPanel: (item: any) => {
-      name = item.name
-      subscription = item.subscription
-      resourceGroup = item.resourceGroup
-      setResourceID(item.name)
-      openPanel()
-      updateData([])
-      setFetching("")
-    },
-  }))
+  // useImperativeHandle(ref, () => ({
+  //   LoadClusterDetailPanel: (item: any) => {
+  //     name = item.name
+  //     subscription = item.subscription
+  //     resourceGroup = item.resourceGroup
+  //     setResourceID(item.name)
+  //     openPanel()
+  //     updateData([])
+  //     setFetching("")
+  //   },
+  // }))
 
   // updateData - updates the state of the component
   // can be used if we want a refresh button.
@@ -120,11 +114,17 @@ export const ClusterDetailPanel = forwardRef<any, ClusterDetailPanelProps>(({ cs
       setFetching("DONE")
     }
 
-    if (fetching === "" && loaded === "DONE" && subscription !== "" && resourceGroup !== "" && name !== "") {
+    if (fetching === "" && props.loaded === "DONE"  && props.currentCluster.clusterName != "") {
+      // open the panel.. 
+      openPanel()
       setFetching("FETCHING")
-      FetchClusterInfo(subscription, resourceGroup, name).then(onData)
-    }
-  }, [data, fetching, setFetching, loaded]) // props.loaded should be tied to the cluster list - or not used.. this component doesn't care.
+      FetchClusterInfo(props.currentCluster.subscription, props.currentCluster.resource, props.currentCluster.clusterName).then(onData) // TODO: fetchClusterInfo accepts IClusterDetail
+    } else if (fetching === "" && props.currentCluster.clusterName === "") { //props.loaded === blank?
+      dismissPanel();
+      // close the panel
+    } // if panel is open and fetching ... shimmer or dot dot dot
+  }, [data, fetching, setFetching, props.currentCluster.clusterName, props.loaded]) 
+  // TODO: props.loaded rename to CSRFTokenAvailable
 
   return (
     <Panel
@@ -143,4 +143,4 @@ export const ClusterDetailPanel = forwardRef<any, ClusterDetailPanelProps>(({ cs
       />
     </Panel>
   )
-})
+}
