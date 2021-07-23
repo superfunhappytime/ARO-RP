@@ -115,8 +115,13 @@ function App() {
   // _setCurrentCluster is a helper function to wrap app state
   // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
   const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
+    setCurrentCluster({ subscription: "", resource: "", clusterName: ""})
     setCurrentCluster(clusterDetail)
     setContentStackStyles(contentStackStylesSmall)
+  }
+
+  const _onCloseDetailPanel = () => {
+    setContentStackStyles(contentStackStylesNormal)
   }
 
   useEffect(() => {
@@ -227,7 +232,7 @@ function App() {
             <ClusterList csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
           </Stack.Item>
           <Stack.Item grow>
-            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} />
+            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} onClose={_onCloseDetailPanel}/>
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
