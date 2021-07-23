@@ -1,5 +1,5 @@
 import { DefaultButton } from '@fluentui/react/lib/Button';
-import { Panel, PanelType } from '@fluentui/react/lib/Panel';
+import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
 import React, { useState, useImperativeHandle, useEffect, Component, useRef, forwardRef, MutableRefObject } from "react"
 import { IMessageBarStyles, MessageBar, MessageBarType } from '@fluentui/react';
@@ -53,6 +53,10 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
     );
   }
 };
+
+const customPanelStyle: Partial<IPanelStyles> = {
+  root: { top: "40px", left: "225px" },
+}
 
 const errorBarStyles: Partial<IMessageBarStyles> = { root: { marginBottom: 15 } }
 
@@ -125,7 +129,7 @@ export function ClusterDetailPanel(props: {
     if (props.currentCluster.clusterName != "") {
       setData([])
       setFetching("")
-      openPanel()
+      openPanel() // isOpen?
     }
   }, [props.currentCluster.clusterName])
 
@@ -133,10 +137,11 @@ export function ClusterDetailPanel(props: {
 
   return (
     <Panel
-      isLightDismiss
       isOpen={isOpen}
-      type={PanelType.large}
+      type={PanelType.custom}
       onDismiss={dismissPanel}
+      isBlocking={false}
+      styles={customPanelStyle}
       closeButtonAriaLabel="Close"
       headerText={resourceID}
     >
@@ -144,7 +149,6 @@ export function ClusterDetailPanel(props: {
       <ClusterDetailComponent
         item={data}
         ref={state} // why do we need ref here?
-      //csrfToken={props.csrfToken} // probably don't need this? we already have fetched the data.
       />
     </Panel>
   )

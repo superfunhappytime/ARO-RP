@@ -48,13 +48,23 @@ const headerTextStyles: ITextStyles = {
   },
 }
 
-const contentStackStyles: IStackStyles = {
+const contentStackStylesNormal: IStackStyles = {
   root: [
     {
       padding: 20,
     },
   ],
 }
+
+const contentStackStylesSmall: IStackStyles = {
+  root: [
+    {
+      padding: 20,
+      width: "215px",
+    },
+  ],
+}
+
 
 const stackNavStyles: IStackStyles = {
   root: {
@@ -98,6 +108,7 @@ function App() {
   const [fetching, setFetching] = useState("")
   const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: ""} ) // TODO: probably not best practice ... nullable reference?
 
+  const [contentStackStyles, setContentStackStyles] = useState<IStackStyles>(contentStackStylesNormal)
   const sshRef = useRef<typeof SSHModal | null>(null)
   const csrfRef = useRef<string>("")
 
@@ -105,6 +116,7 @@ function App() {
   // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
   const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
     setCurrentCluster(clusterDetail)
+    setContentStackStyles(contentStackStylesSmall)
   }
 
   useEffect(() => {
@@ -216,14 +228,6 @@ function App() {
           </Stack.Item>
           <Stack.Item grow>
             <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} />
-
-            {/* ClusterDetailPanel hidden
-              onclick in cluster list
-              hide
-              show panel
-
-              be happy.
-              */}
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
