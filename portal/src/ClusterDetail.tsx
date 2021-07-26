@@ -1,24 +1,26 @@
-import { DefaultButton } from '@fluentui/react/lib/Button';
 import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
-import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
-import React, { useState, useImperativeHandle, useEffect, Component, useRef, forwardRef, MutableRefObject } from "react"
-import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Toggle, Stack } from '@fluentui/react';
-//import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
+import { Shimmer } from '@fluentui/react/lib/Shimmer';
+import React, { useState, useEffect, Component, useRef, MutableRefObject } from "react"
+import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Stack, SelectionMode, Text, Separator, mergeStyleSets, IDetailsRowStyles } from '@fluentui/react';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
 import { Nav, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
+import { ClusterDetailComponent } from './ClusterDetailList'
 
 const navStyles: Partial<INavStyles> = {
   root: {
     width: 155,
-    //padding: 5,
+    paddingRight: "10px"
   },
   link: {
     whiteSpace: 'normal',
     lineHeight: 'inherit',
   },
+  groupContent: {
+    marginBottom: "0px"
+  }
 };
 
 const navLinkGroups: INavLinkGroup[] = [
@@ -28,9 +30,8 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Overview',
         key: 'overview',
         url: "#overview",
-        isExpanded: true,
         target: '_blank',
-        icon: 'Overview',
+        icon: 'ThisPC',
       },
     ],
   },
@@ -40,55 +41,35 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Nodes',
         key: 'nodes',
         url: "#nodes",
-        isExpanded: true,
         target: '_blank',
-      },
-    ],
-  },
-  {
-    name: "Extra",
-    links: [
-      {
-        name: 'Something',
-        key: 'something',
-        url: "#something",
-        isExpanded: true,
-        target: '_blank',
+        icon: 'BuildQueue'
       },
     ],
   },
 ];
 
-// does the controller need props?
-type ClusterDetailPanelProps = {
-  csrfToken: MutableRefObject<string>
-  name: any
-  subscription: any
-  resourceGroup: any
-  loaded: string
-}
-
+// TODO: Commented out fields contain complex objects
 interface IClusterDetails {
-  apiServer: any
-  architectureVersion: string
+  // apiServer: any
+  // architectureVersion: string
   consoleLink: string
   createdAt: string
   createdBy: string
   failedProvisioningState: string
   infraId: string
-  ingressProfiles: any
+  // ingressProfiles: any
   lastAdminUpdateError: string
   lastModifiedAt: string
   lastModifiedBy: string
   lastProvisioningState: string
   location: string
-  masterProfile: string
+  // masterProfile: string
   name: string
   provisioningState: string
   resourceId: string
-  tags: any
+  // tags: any
   version: string
-  workerProfile: any
+  // workerProfile: any
 }
 
 interface ClusterDetailComponentProps {
@@ -101,64 +82,24 @@ interface IClusterDetailComponentState {
   item: IClusterDetails // why both state and props?
 }
 
+const listStyle: Partial<IDetailsRowStyles> = {
+  cell: {
+    fontSize: 14
+  }
+}
+
 const columns: IColumn[] = [{
-  key: "key",
-  name: "key",
-  fieldName: "key",
-  minWidth: 300
+  key: "0",
+  name: "0",
+  fieldName: "0",
+  minWidth: 300,
 },
 {
-  key: "value",
-  name: "value",
-  fieldName: "value",
-  minWidth: 300
-},]
-const onRenderCell = (
-  nestingDepth?: number,
-  item?: any,
-  itemIndex?: number,
-  group?: IGroup,
-): React.ReactNode => {
-  return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
-    <DetailsRow
-      columns={columns}
-      groupNestingDepth={nestingDepth}
-      item={item}
-      itemIndex={itemIndex}
-    />
-  ) : null;
-};
-
-
-class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClusterDetailComponentState> {
-
-  constructor(props: ClusterDetailComponentProps | Readonly<ClusterDetailComponentProps>) {
-    super(props);
-    // this.state = { item: this.props.item };
-  }
-
-  public render() {
-    return (
-      <div>
-        <h1>{this.props.clusterName}</h1>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>
-          <GroupedList
-            onRenderCell={onRenderCell}
-            items={Object.keys(this.props.item)}></GroupedList>
-          <div>{this.props.item.resourceId}</div>
-          <div>{this.props.item.name}</div>
-          <div>{this.props.item.lastModifiedAt}</div>
-          <div>{this.props.item.lastModifiedBy}</div>
-          <div>{this.props.item.lastProvisioningState}</div>
-          <div>{this.props.item.provisioningState}</div>
-          <div>{this.props.item.location}</div>
-          <div>{this.props.item.version}</div>
-          <div>{this.props.item.consoleLink}</div>
-        </Shimmer>
-      </div>
-    );
-  }
-};
+  key: "1",
+  name: "1",
+  fieldName: "1",
+  minWidth: 300,
+}] 
 
 const customPanelStyle: Partial<IPanelStyles> = {
   root: { top: "40px", left: "225px"} ,
@@ -263,7 +204,7 @@ export function ClusterDetailPanel(props: {
       <Stack styles={contentStackStylesNormal}>
         <Stack.Item grow>{error && errorBar()}</Stack.Item>
         <Stack horizontal>
-          <Stack.Item grow>
+          <Stack.Item>
             <Nav
               //onLinkClick={_onLinkClick}
               selectedKey="key3"
@@ -272,6 +213,7 @@ export function ClusterDetailPanel(props: {
               groups={navLinkGroups}
             />
           </Stack.Item>
+          <Separator vertical />
           <Stack.Item grow>
             <ClusterDetailComponent
               item={data}
