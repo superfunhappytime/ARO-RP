@@ -68,27 +68,29 @@ type ClusterDetailPanelProps = {
   loaded: string
 }
 
+
+// TODO: Commented out fields contain complex objects
 interface IClusterDetails {
-  apiServer: any
-  architectureVersion: string
+  // apiServer: any
+  // architectureVersion: string
   consoleLink: string
   createdAt: string
   createdBy: string
   failedProvisioningState: string
   infraId: string
-  ingressProfiles: any
+  // ingressProfiles: any
   lastAdminUpdateError: string
   lastModifiedAt: string
   lastModifiedBy: string
   lastProvisioningState: string
   location: string
-  masterProfile: string
+  // masterProfile: string
   name: string
   provisioningState: string
   resourceId: string
-  tags: any
+  // tags: any
   version: string
-  workerProfile: any
+  // workerProfile: any
 }
 
 interface ClusterDetailComponentProps {
@@ -102,58 +104,52 @@ interface IClusterDetailComponentState {
 }
 
 const columns: IColumn[] = [{
-  key: "key",
-  name: "key",
-  fieldName: "key",
-  minWidth: 300
+  key: "0",
+  name: "0",
+  fieldName: "0",
+  minWidth: 300,
 },
 {
-  key: "value",
-  name: "value",
-  fieldName: "value",
-  minWidth: 300
-},]
-const onRenderCell = (
-  nestingDepth?: number,
-  item?: any,
-  itemIndex?: number,
-  group?: IGroup,
-): React.ReactNode => {
-  return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
-    <DetailsRow
-      columns={columns}
-      groupNestingDepth={nestingDepth}
-      item={item}
-      itemIndex={itemIndex}
-    />
-  ) : null;
-};
+  key: "1",
+  name: "1",
+  fieldName: "1",
+  minWidth: 300,
+}] 
 
 
 class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClusterDetailComponentState> {
 
   constructor(props: ClusterDetailComponentProps | Readonly<ClusterDetailComponentProps>) {
     super(props);
-    // this.state = { item: this.props.item };
   }
 
   public render() {
+    const onRenderCell = (
+      nestingDepth?: number,
+      item?: any,
+      itemIndex?: number,
+      group?: IGroup,
+    ): React.ReactNode => {
+      return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
+        <DetailsRow
+          columns={columns}
+          groupNestingDepth={nestingDepth}
+          item={item}
+          itemIndex={itemIndex}
+          selectionMode={SelectionMode.multiple}
+          group={group}
+        />
+      ) : null;
+    };
+
     return (
       <div>
         <h1>{this.props.clusterName}</h1>
         <Shimmer isDataLoaded={this.props.isDataLoaded}>
           <GroupedList
+            items={Object.entries(this.props.item)}
             onRenderCell={onRenderCell}
-            items={Object.keys(this.props.item)}></GroupedList>
-          <div>{this.props.item.resourceId}</div>
-          <div>{this.props.item.name}</div>
-          <div>{this.props.item.lastModifiedAt}</div>
-          <div>{this.props.item.lastModifiedBy}</div>
-          <div>{this.props.item.lastProvisioningState}</div>
-          <div>{this.props.item.provisioningState}</div>
-          <div>{this.props.item.location}</div>
-          <div>{this.props.item.version}</div>
-          <div>{this.props.item.consoleLink}</div>
+          />
         </Shimmer>
       </div>
     );
