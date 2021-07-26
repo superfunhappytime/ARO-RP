@@ -48,10 +48,10 @@ const headerTextStyles: ITextStyles = {
   },
 }
 
-const contentStackStylesNormal: IStackStyles = {
+export const contentStackStylesNormal: IStackStyles = {
   root: [
     {
-      padding: 20,
+      padding: 10,
     },
   ],
 }
