@@ -3,11 +3,61 @@ import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
 import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
 import React, { useState, useImperativeHandle, useEffect, Component, useRef, forwardRef, MutableRefObject } from "react"
-import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Toggle } from '@fluentui/react';
-import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
+import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Toggle, Stack } from '@fluentui/react';
+//import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
-import { IClusterDetail } from "./App"
+import { IClusterDetail, contentStackStylesNormal } from "./App"
+import { Nav, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
+
+const navStyles: Partial<INavStyles> = {
+  root: {
+    width: 155,
+    //padding: 5,
+  },
+  link: {
+    whiteSpace: 'normal',
+    lineHeight: 'inherit',
+  },
+};
+
+const navLinkGroups: INavLinkGroup[] = [
+  {
+    links: [
+      {
+        name: 'Overview',
+        key: 'overview',
+        url: "#overview",
+        isExpanded: true,
+        target: '_blank',
+        icon: 'Overview',
+      },
+    ],
+  },
+  {
+    links: [
+      {
+        name: 'Nodes',
+        key: 'nodes',
+        url: "#nodes",
+        isExpanded: true,
+        target: '_blank',
+      },
+    ],
+  },
+  {
+    name: "Extra",
+    links: [
+      {
+        name: 'Something',
+        key: 'something',
+        url: "#something",
+        isExpanded: true,
+        target: '_blank',
+      },
+    ],
+  },
+];
 
 // does the controller need props?
 type ClusterDetailPanelProps = {
@@ -25,7 +75,7 @@ interface IClusterDetails {
   createdAt: string
   createdBy: string
   failedProvisioningState: string
-  infraId : string
+  infraId: string
   ingressProfiles: any
   lastAdminUpdateError: string
   lastModifiedAt: string
@@ -51,7 +101,7 @@ interface IClusterDetailComponentState {
   item: IClusterDetails // why both state and props?
 }
 
-const columns : IColumn[] = [{
+const columns: IColumn[] = [{
   key: "key",
   name: "key",
   fieldName: "key",
@@ -65,7 +115,7 @@ const columns : IColumn[] = [{
 },]
 const onRenderCell = (
   nestingDepth?: number,
-  item?: IExampleItem,
+  item?: any,
   itemIndex?: number,
   group?: IGroup,
 ): React.ReactNode => {
@@ -111,7 +161,8 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
 };
 
 const customPanelStyle: Partial<IPanelStyles> = {
-  root: { top: "40px", left: "225px" },
+  root: { top: "40px", left: "225px"} ,
+  content: { paddingLeft: 5, paddingRight: 5, },
 }
 
 const errorBarStyles: Partial<IMessageBarStyles> = { root: { marginBottom: 15 } }
@@ -193,6 +244,10 @@ export function ClusterDetailPanel(props: {
     }
   }, [props.currentCluster.clusterName])
 
+
+  function _onRenderGroupHeader(group: INavLinkGroup): JSX.Element {
+    return <h3>{group.name}</h3>;
+  }
   // TODO: props.loaded rename to CSRFTokenAvailable
 
   return (
@@ -205,12 +260,27 @@ export function ClusterDetailPanel(props: {
       closeButtonAriaLabel="Close"
       headerText={resourceID}
     >
-      {error && errorBar()}
-      <ClusterDetailComponent
-        item={data}
-        clusterName={props.currentCluster.clusterName}
-        isDataLoaded={dataLoaded}
-      />
+      <Stack styles={contentStackStylesNormal}>
+        <Stack.Item grow>{error && errorBar()}</Stack.Item>
+        <Stack horizontal>
+          <Stack.Item grow>
+            <Nav
+              //onLinkClick={_onLinkClick}
+              selectedKey="key3"
+              ariaLabel="Nav basic example"
+              styles={navStyles}
+              groups={navLinkGroups}
+            />
+          </Stack.Item>
+          <Stack.Item grow>
+            <ClusterDetailComponent
+              item={data}
+              clusterName={props.currentCluster.clusterName}
+              isDataLoaded={dataLoaded}
+            />
+          </Stack.Item>
+        </Stack>
+      </Stack>
     </Panel>
   )
 }
