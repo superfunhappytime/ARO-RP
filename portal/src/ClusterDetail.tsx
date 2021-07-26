@@ -3,7 +3,8 @@ import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
 import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
 import React, { useState, useImperativeHandle, useEffect, Component, useRef, forwardRef, MutableRefObject } from "react"
-import { IMessageBarStyles, MessageBar, MessageBarType } from '@fluentui/react';
+import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Toggle } from '@fluentui/react';
+import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail } from "./App"
@@ -18,28 +19,65 @@ type ClusterDetailPanelProps = {
 }
 
 interface IClusterDetails {
-  key: string
-  name: string
-  subscription: string
-  resourceGroup: string
-  id: string
-  version: string
-  createdDate: string
-  provisionedBy: string
-  lastModified: string
-  state: string
-  failed: string
+  apiServer: any
+  architectureVersion: string
   consoleLink: string
+  createdAt: string
+  createdBy: string
+  failedProvisioningState: string
+  infraId : string
+  ingressProfiles: any
+  lastAdminUpdateError: string
+  lastModifiedAt: string
+  lastModifiedBy: string
+  lastProvisioningState: string
+  location: string
+  masterProfile: string
+  name: string
+  provisioningState: string
+  resourceId: string
+  tags: any
+  version: string
+  workerProfile: any
 }
 
 interface ClusterDetailComponentProps {
   item: IClusterDetails
+  clusterName: string
   isDataLoaded: boolean
 }
 
 interface IClusterDetailComponentState {
   item: IClusterDetails // why both state and props?
 }
+
+const columns : IColumn[] = [{
+  key: "key",
+  name: "key",
+  fieldName: "key",
+  minWidth: 300
+},
+{
+  key: "value",
+  name: "value",
+  fieldName: "value",
+  minWidth: 300
+},]
+const onRenderCell = (
+  nestingDepth?: number,
+  item?: IExampleItem,
+  itemIndex?: number,
+  group?: IGroup,
+): React.ReactNode => {
+  return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
+    <DetailsRow
+      columns={columns}
+      groupNestingDepth={nestingDepth}
+      item={item}
+      itemIndex={itemIndex}
+    />
+  ) : null;
+};
 
 
 class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClusterDetailComponentState> {
@@ -52,19 +90,21 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
   public render() {
     return (
       <div>
-        <Shimmer />
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>key: {this.props.item.key}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>name: {this.props.item.name}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>subscription: {this.props.item.subscription}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>resourceGroup: {this.props.item.resourceGroup}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>id: {this.props.item.id}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>version: {this.props.item.version}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>createdDate: {this.props.item.createdDate}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>provisionedBy: {this.props.item.provisionedBy}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>lastModified: {this.props.item.lastModified}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>state: {this.props.item.state}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>failed: {this.props.item.failed}</Shimmer>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>consoleLink: {this.props.item.consoleLink}</Shimmer>
+        <h1>{this.props.clusterName}</h1>
+        <Shimmer isDataLoaded={this.props.isDataLoaded}>
+          <GroupedList
+            onRenderCell={onRenderCell}
+            items={Object.keys(this.props.item)}></GroupedList>
+          <div>{this.props.item.resourceId}</div>
+          <div>{this.props.item.name}</div>
+          <div>{this.props.item.lastModifiedAt}</div>
+          <div>{this.props.item.lastModifiedBy}</div>
+          <div>{this.props.item.lastProvisioningState}</div>
+          <div>{this.props.item.provisioningState}</div>
+          <div>{this.props.item.location}</div>
+          <div>{this.props.item.version}</div>
+          <div>{this.props.item.consoleLink}</div>
+        </Shimmer>
       </div>
     );
   }
@@ -168,6 +208,7 @@ export function ClusterDetailPanel(props: {
       {error && errorBar()}
       <ClusterDetailComponent
         item={data}
+        clusterName={props.currentCluster.clusterName}
         isDataLoaded={dataLoaded}
       />
     </Panel>
