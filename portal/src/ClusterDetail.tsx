@@ -1,10 +1,8 @@
-import { DefaultButton } from '@fluentui/react/lib/Button';
 import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
-import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
-import React, { useState, useImperativeHandle, useEffect, Component, useRef, forwardRef, MutableRefObject } from "react"
-import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Toggle, Stack } from '@fluentui/react';
-//import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
+import { Shimmer } from '@fluentui/react/lib/Shimmer';
+import React, { useState, useEffect, Component, useRef, MutableRefObject } from "react"
+import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Stack, SelectionMode, Text, Separator, mergeStyleSets, IDetailsRowStyles } from '@fluentui/react';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
@@ -13,12 +11,15 @@ import { Nav, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
 const navStyles: Partial<INavStyles> = {
   root: {
     width: 155,
-    //padding: 5,
+    paddingRight: "10px"
   },
   link: {
     whiteSpace: 'normal',
     lineHeight: 'inherit',
   },
+  groupContent: {
+    marginBottom: "0px"
+  }
 };
 
 const navLinkGroups: INavLinkGroup[] = [
@@ -28,9 +29,8 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Overview',
         key: 'overview',
         url: "#overview",
-        isExpanded: true,
         target: '_blank',
-        icon: 'Overview',
+        icon: 'ThisPC',
       },
     ],
   },
@@ -40,34 +40,12 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Nodes',
         key: 'nodes',
         url: "#nodes",
-        isExpanded: true,
         target: '_blank',
-      },
-    ],
-  },
-  {
-    name: "Extra",
-    links: [
-      {
-        name: 'Something',
-        key: 'something',
-        url: "#something",
-        isExpanded: true,
-        target: '_blank',
+        icon: 'BuildQueue'
       },
     ],
   },
 ];
-
-// does the controller need props?
-type ClusterDetailPanelProps = {
-  csrfToken: MutableRefObject<string>
-  name: any
-  subscription: any
-  resourceGroup: any
-  loaded: string
-}
-
 
 // TODO: Commented out fields contain complex objects
 interface IClusterDetails {
@@ -103,6 +81,12 @@ interface IClusterDetailComponentState {
   item: IClusterDetails // why both state and props?
 }
 
+const listStyle: Partial<IDetailsRowStyles> = {
+  cell: {
+    fontSize: 14
+  }
+}
+
 const columns: IColumn[] = [{
   key: "0",
   name: "0",
@@ -132,7 +116,10 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
     ): React.ReactNode => {
       return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
         <DetailsRow
+          styles={listStyle}
+          rowWidth={200}
           columns={columns}
+          compact={true}
           groupNestingDepth={nestingDepth}
           item={item}
           itemIndex={itemIndex}
@@ -143,15 +130,16 @@ class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClu
     };
 
     return (
-      <div>
-        <h1>{this.props.clusterName}</h1>
+      <Stack styles={contentStackStylesNormal}>
+        <Text variant="xxLarge">{this.props.clusterName}</Text>
         <Shimmer isDataLoaded={this.props.isDataLoaded}>
           <GroupedList
+            compact={true}
             items={Object.entries(this.props.item)}
             onRenderCell={onRenderCell}
           />
         </Shimmer>
-      </div>
+      </Stack>
     );
   }
 };
@@ -259,7 +247,7 @@ export function ClusterDetailPanel(props: {
       <Stack styles={contentStackStylesNormal}>
         <Stack.Item grow>{error && errorBar()}</Stack.Item>
         <Stack horizontal>
-          <Stack.Item grow>
+          <Stack.Item>
             <Nav
               //onLinkClick={_onLinkClick}
               selectedKey="key3"
@@ -268,6 +256,7 @@ export function ClusterDetailPanel(props: {
               groups={navLinkGroups}
             />
           </Stack.Item>
+          <Separator vertical />
           <Stack.Item grow>
             <ClusterDetailComponent
               item={data}
