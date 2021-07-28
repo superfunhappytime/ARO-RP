@@ -1,8 +1,7 @@
 import { IPanelStyles, Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { useBoolean } from '@fluentui/react-hooks';
-import { Shimmer } from '@fluentui/react/lib/Shimmer';
-import React, { useState, useEffect, Component, useRef, MutableRefObject } from "react"
-import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar, MessageBarType, Stack, SelectionMode, Text, Separator, mergeStyleSets, IDetailsRowStyles } from '@fluentui/react';
+import { useState, useEffect, useRef, MutableRefObject } from "react"
+import { IMessageBarStyles, MessageBar, MessageBarType, Stack, Separator } from '@fluentui/react';
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
@@ -45,59 +44,6 @@ const navLinkGroups: INavLinkGroup[] = [
     ],
   },
 ];
-
-// TODO: Commented out fields contain complex objects
-interface IClusterDetails {
-  // apiServer: any
-  // architectureVersion: string
-  consoleLink: string
-  createdAt: string
-  createdBy: string
-  failedProvisioningState: string
-  infraId: string
-  // ingressProfiles: any
-  lastAdminUpdateError: string
-  lastModifiedAt: string
-  lastModifiedBy: string
-  lastProvisioningState: string
-  location: string
-  // masterProfile: string
-  name: string
-  provisioningState: string
-  resourceId: string
-  // tags: any
-  version: string
-  // workerProfile: any
-}
-
-interface ClusterDetailComponentProps {
-  item: IClusterDetails
-  clusterName: string
-  isDataLoaded: boolean
-}
-
-interface IClusterDetailComponentState {
-  item: IClusterDetails // why both state and props?
-}
-
-const listStyle: Partial<IDetailsRowStyles> = {
-  cell: {
-    fontSize: 14
-  }
-}
-
-const columns: IColumn[] = [{
-  key: "0",
-  name: "0",
-  fieldName: "0",
-  minWidth: 300,
-},
-{
-  key: "1",
-  name: "1",
-  fieldName: "1",
-  minWidth: 300,
-}]
 
 const customPanelStyle: Partial<IPanelStyles> = {
   root: { top: "40px", left: "225px" },
