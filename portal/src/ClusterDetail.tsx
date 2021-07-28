@@ -7,6 +7,7 @@ import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
 import { Nav, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
+import { ClusterDetailComponent } from './ClusterDetailList'
 
 const navStyles: Partial<INavStyles> = {
   root: {
@@ -99,50 +100,6 @@ const columns: IColumn[] = [{
   fieldName: "1",
   minWidth: 300,
 }] 
-
-
-class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClusterDetailComponentState> {
-
-  constructor(props: ClusterDetailComponentProps | Readonly<ClusterDetailComponentProps>) {
-    super(props);
-  }
-
-  public render() {
-    const onRenderCell = (
-      nestingDepth?: number,
-      item?: any,
-      itemIndex?: number,
-      group?: IGroup,
-    ): React.ReactNode => {
-      return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
-        <DetailsRow
-          styles={listStyle}
-          rowWidth={200}
-          columns={columns}
-          compact={true}
-          groupNestingDepth={nestingDepth}
-          item={item}
-          itemIndex={itemIndex}
-          selectionMode={SelectionMode.multiple}
-          group={group}
-        />
-      ) : null;
-    };
-
-    return (
-      <Stack styles={contentStackStylesNormal}>
-        <Text variant="xxLarge">{this.props.clusterName}</Text>
-        <Shimmer isDataLoaded={this.props.isDataLoaded}>
-          <GroupedList
-            compact={true}
-            items={Object.entries(this.props.item)}
-            onRenderCell={onRenderCell}
-          />
-        </Shimmer>
-      </Stack>
-    );
-  }
-};
 
 const customPanelStyle: Partial<IPanelStyles> = {
   root: { top: "40px", left: "225px"} ,
