@@ -1,30 +1,26 @@
 import { Shimmer } from '@fluentui/react/lib/Shimmer';
-import React, { Component } from "react"
+import { Component } from "react"
 import { Stack, Text, IStackStyles, IStackItemStyles } from '@fluentui/react';
 import { contentStackStylesNormal } from "./App"
 
-// TODO: Commented out fields contain complex objects
 interface IClusterDetails {
-  // apiServer: any
-  // architectureVersion: string
+  apiServerVisibility: string
+  apiServerURL: string
+  architectureVersion: string
   consoleLink: string
   createdAt: string
   createdBy: string
   failedProvisioningState: string
   infraId: string
-  // ingressProfiles: any
   lastAdminUpdateError: string
   lastModifiedAt: string
   lastModifiedBy: string
   lastProvisioningState: string
   location: string
-  // masterProfile: string
   name: string
   provisioningState: string
   resourceId: string
-  // tags: any
   version: string
-  // workerProfile: any
 }
 
 interface ClusterDetailComponentProps {
@@ -40,14 +36,14 @@ interface IClusterDetailComponentState {
 
 const KeyColumnStyle: Partial<IStackStyles> = {
   root: {
-    paddingTop: "10px",
-    paddingRight: "15px",
+    paddingTop: 10,
+    paddingRight: 15,
   }
 }
 
 const ValueColumnStyle: Partial<IStackStyles> = {
   root: {
-    paddingTop: "10px",
+    paddingTop: 10,
   }
 }
 
@@ -57,15 +53,31 @@ const KeyStyle: IStackItemStyles = {
     alignSelf: "flex-start",
     fontVariantAlternates: "bold",
     color: "grey",
-    paddingBottom: "10px"
+    paddingBottom: 10
   }
 }
 
 const ValueStyle: IStackItemStyles = {
   root: {
-    paddingBottom: "10px"
+    paddingBottom: 10
   }
 }
+
+function ClusterDetailCell(
+  value: any,
+): any {
+  if (typeof (value.value) == typeof (" ")) {
+    return <Stack.Item styles={value.style}>
+      <Text styles={value.style} variant={'medium'}>{value.value}</Text>
+    </Stack.Item>
+  } else {
+    value.style.paddingLeft += 40;
+    return Object.entries(value.value).map((innerValue: any, index: number) => (
+      <ClusterDetailCell style={value.style} value={innerValue[1]} />
+    )
+    )
+  }
+};
 
 export class ClusterDetailComponent extends Component<ClusterDetailComponentProps, IClusterDetailComponentState> {
 
@@ -77,41 +89,37 @@ export class ClusterDetailComponent extends Component<ClusterDetailComponentProp
     switch (this.props.detailPanelVisible) {
       case "Overview":
         {
-          const ClusterDetailCell = (
-            value: any,
-          ) => (
-            <Shimmer isDataLoaded={this.props.isDataLoaded}>
-              <Stack.Item styles={value.style}>
-                <Text styles={value.style} variant={'medium'}>{value.value}</Text>
-              </Stack.Item>
-            </Shimmer>
-          );
           const entries = Object.entries(this.props.item)
+
           return (
             <Stack styles={contentStackStylesNormal}>
               <Text variant="xxLarge">{this.props.clusterName}</Text>
-              <Stack horizontal>
-                <Stack styles={KeyColumnStyle}>
-                  {entries.map((value: any, index: number) => (
-                    <ClusterDetailCell style={KeyStyle} key={index} value={value[0]} />
-                  )
-                  )}
+              <Shimmer isDataLoaded={this.props.isDataLoaded} cols={3} rows={16}>
+                <Stack horizontal>
+                  <Stack styles={KeyColumnStyle}>
+                    {entries.map((value: any, index: number) => (
+                      <ClusterDetailCell style={KeyStyle} key={index} value={value[0]} />
+                    )
+                    )}
+                  </Stack>
+
+                  <Stack styles={KeyColumnStyle}>
+                    {Array(entries.length).fill(':').map((value: any, index: number) => (
+                      <ClusterDetailCell style={KeyStyle} key={index} value={value} />
+                    )
+                    )}
+                  </Stack>
+
+                  <Stack styles={ValueColumnStyle}>
+                    {entries.map((value: [string, string | Object | null], index: number) => (
+                      <ClusterDetailCell style={ValueStyle}
+                        key={index}
+                        value={value[1] != null && value[1].toString().length > 0 ? value[1] : "Undefined"} />
+                    )
+                    )}
+                  </Stack>
                 </Stack>
-      
-                <Stack styles={KeyColumnStyle}>
-                  {Array(entries.length).fill(':').map((value: any, index: number) => (
-                    <ClusterDetailCell style={KeyStyle} key={index} value={value} />
-                  )
-                  )}
-                </Stack>
-      
-                <Stack styles={ValueColumnStyle}>
-                  {entries.map((value: string[], index: number) => (
-                    <ClusterDetailCell style={ValueStyle} key={index} value={value[1].length > 0 ? value[1] : "Undefined"} />
-                  )
-                  )}
-                </Stack>
-              </Stack>
+              </Shimmer>
             </Stack>
           );
         } break;
@@ -134,11 +142,11 @@ export class ClusterDetailComponent extends Component<ClusterDetailComponentProp
                 <Stack styles={KeyColumnStyle}>
                   Node detail
                 </Stack>
-      
+
                 <Stack styles={KeyColumnStyle}>
-                 Node detail2
+                  Node detail2
                 </Stack>
-      
+
                 <Stack styles={ValueColumnStyle}>
                   Node detail3
                 </Stack>
