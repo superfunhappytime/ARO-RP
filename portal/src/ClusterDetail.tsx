@@ -6,7 +6,7 @@ import { DetailsRow, GroupedList, IColumn, IGroup, IMessageBarStyles, MessageBar
 import { AxiosResponse } from 'axios';
 import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
-import { Nav, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
+import { Nav, INavLink, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
 import { ClusterDetailComponent } from './ClusterDetailList'
 
 const navStyles: Partial<INavStyles> = {
@@ -30,7 +30,6 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Overview',
         key: 'overview',
         url: "#overview",
-        target: '_blank',
         icon: 'ThisPC',
       },
     ],
@@ -41,7 +40,6 @@ const navLinkGroups: INavLinkGroup[] = [
         name: 'Nodes',
         key: 'nodes',
         url: "#nodes",
-        target: '_blank',
         icon: 'BuildQueue'
       },
     ],
@@ -99,10 +97,10 @@ const columns: IColumn[] = [{
   name: "1",
   fieldName: "1",
   minWidth: 300,
-}] 
+}]
 
 const customPanelStyle: Partial<IPanelStyles> = {
-  root: { top: "40px", left: "225px"} ,
+  root: { top: "40px", left: "225px" },
   content: { paddingLeft: 5, paddingRight: 5, },
 }
 
@@ -121,6 +119,7 @@ export function ClusterDetailPanel(props: {
   const [resourceID, setResourceID] = useState("")
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false); // panel controls
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+  const [detailPanelVisible, setdetailPanelVisible] = useState<string>("Overview");
 
   const errorBar = (): any => {
     return (
@@ -185,12 +184,13 @@ export function ClusterDetailPanel(props: {
     }
   }, [props.currentCluster.clusterName])
 
-
-  function _onRenderGroupHeader(group: INavLinkGroup): JSX.Element {
-    return <h3>{group.name}</h3>;
+  function _onLinkClick(ev?: React.MouseEvent<HTMLElement>, item?: INavLink) {
+    if (item && item.name !== '') {
+      setdetailPanelVisible(item.name)
+    }
   }
-  // TODO: props.loaded rename to CSRFTokenAvailable
 
+  // TODO: props.loaded rename to CSRFTokenAvailable
   return (
     <Panel
       isOpen={isOpen}
@@ -206,9 +206,8 @@ export function ClusterDetailPanel(props: {
         <Stack horizontal>
           <Stack.Item>
             <Nav
-              //onLinkClick={_onLinkClick}
-              selectedKey="key3"
-              ariaLabel="Nav basic example"
+              onLinkClick={_onLinkClick}
+              ariaLabel="Select a tab to view"
               styles={navStyles}
               groups={navLinkGroups}
             />
@@ -219,6 +218,7 @@ export function ClusterDetailPanel(props: {
               item={data}
               clusterName={props.currentCluster.clusterName}
               isDataLoaded={dataLoaded}
+              detailPanelVisible={detailPanelVisible}
             />
           </Stack.Item>
         </Stack>

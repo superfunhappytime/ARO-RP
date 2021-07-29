@@ -31,6 +31,7 @@ interface ClusterDetailComponentProps {
   item: IClusterDetails
   clusterName: string
   isDataLoaded: boolean
+  detailPanelVisible: string
 }
 
 interface IClusterDetailComponentState {
@@ -73,42 +74,78 @@ export class ClusterDetailComponent extends Component<ClusterDetailComponentProp
   }
 
   public render() {
-    const ClusterDetailCell = (
-      value: any,
-    ) => (
-      <Shimmer isDataLoaded={this.props.isDataLoaded}>
-        <Stack.Item styles={value.style}>
-          <Text styles={value.style} variant={'medium'}>{value.value}</Text>
-        </Stack.Item>
-      </Shimmer>
-    );
-    const entries = Object.entries(this.props.item)
-    return (
-      <Stack styles={contentStackStylesNormal}>
-        <Text variant="xxLarge">{this.props.clusterName}</Text>
-          <Stack horizontal>
-            <Stack styles={KeyColumnStyle}>
-              {entries.map((value: any, index: number) => (
-                  <ClusterDetailCell style={KeyStyle} key={index} value={value[0]}/>
-                )
-              )}
+    switch (this.props.detailPanelVisible) {
+      case "Overview":
+        {
+          const ClusterDetailCell = (
+            value: any,
+          ) => (
+            <Shimmer isDataLoaded={this.props.isDataLoaded}>
+              <Stack.Item styles={value.style}>
+                <Text styles={value.style} variant={'medium'}>{value.value}</Text>
+              </Stack.Item>
+            </Shimmer>
+          );
+          const entries = Object.entries(this.props.item)
+          return (
+            <Stack styles={contentStackStylesNormal}>
+              <Text variant="xxLarge">{this.props.clusterName}</Text>
+              <Stack horizontal>
+                <Stack styles={KeyColumnStyle}>
+                  {entries.map((value: any, index: number) => (
+                    <ClusterDetailCell style={KeyStyle} key={index} value={value[0]} />
+                  )
+                  )}
+                </Stack>
+      
+                <Stack styles={KeyColumnStyle}>
+                  {Array(entries.length).fill(':').map((value: any, index: number) => (
+                    <ClusterDetailCell style={KeyStyle} key={index} value={value} />
+                  )
+                  )}
+                </Stack>
+      
+                <Stack styles={ValueColumnStyle}>
+                  {entries.map((value: string[], index: number) => (
+                    <ClusterDetailCell style={ValueStyle} key={index} value={value[1].length > 0 ? value[1] : "Undefined"} />
+                  )
+                  )}
+                </Stack>
+              </Stack>
             </Stack>
-
-            <Stack styles={KeyColumnStyle}>
-            {Array(entries.length).fill(':').map((value: any, index: number) => (
-                <ClusterDetailCell style={KeyStyle} key={index} value={value}/>
-              )
-            )}
+          );
+        } break;
+      case "Nodes":
+        {
+          const ClusterDetailCell = (
+            value: any,
+          ) => (
+            <Shimmer isDataLoaded={this.props.isDataLoaded}>
+              <Stack.Item styles={value.style}>
+                <Text styles={value.style} variant={'medium'}>{value.value}</Text>
+              </Stack.Item>
+            </Shimmer>
+          );
+          const entries = Object.entries(this.props.item)
+          return (
+            <Stack styles={contentStackStylesNormal}>
+              <Text variant="xxLarge">{this.props.clusterName}</Text>
+              <Stack horizontal>
+                <Stack styles={KeyColumnStyle}>
+                  Node detail
+                </Stack>
+      
+                <Stack styles={KeyColumnStyle}>
+                 Node detail2
+                </Stack>
+      
+                <Stack styles={ValueColumnStyle}>
+                  Node detail3
+                </Stack>
+              </Stack>
             </Stack>
-            
-            <Stack styles={ValueColumnStyle}>
-              {entries.map((value: string[], index: number) => (
-                  <ClusterDetailCell style={ValueStyle} key={index} value={value[1].length > 0 ? value[1] : "Undefined"}/>
-                )
-              )}
-            </Stack>
-          </Stack>
-      </Stack>
-    );
+          );
+        } break;
+    }
   }
 };
