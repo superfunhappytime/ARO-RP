@@ -1,9 +1,20 @@
-import { Shimmer } from '@fluentui/react/lib/Shimmer';
+import { IShimmerStyles, Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
 import { Component } from "react"
 import { Stack, Text, IStackStyles, IStackItemStyles } from '@fluentui/react';
 import { contentStackStylesNormal } from "./App"
 
-interface IClusterDetails {
+interface ClusterDetailComponentProps {
+  item: any
+  clusterName: string
+  isDataLoaded: boolean
+  detailPanelVisible: string
+}
+
+interface IClusterDetailComponentState {
+  item: IClusterDetails // why both state and props?
+}
+
+export interface IClusterDetails {
   apiServerVisibility: string
   apiServerURL: string
   architectureVersion: string
@@ -21,18 +32,49 @@ interface IClusterDetails {
   provisioningState: string
   resourceId: string
   version: string
+  installStatus: string
 }
 
-interface ClusterDetailComponentProps {
-  item: IClusterDetails
-  clusterName: string
-  isDataLoaded: boolean
-  detailPanelVisible: string
+const clusterDetailHeadings : IClusterDetails = {
+  apiServerVisibility: 'ApiServer Visibility',
+  apiServerURL: 'ApiServer URL',
+  architectureVersion: 'Architecture Version',
+  consoleLink: 'Console Link',
+  createdAt: 'Created At',
+  createdBy: 'Created By',
+  failedProvisioningState: 'Failed Provisioning State',
+  infraId: 'Infra Id',
+  lastAdminUpdateError: 'Last Admin Update Error',
+  lastModifiedAt: 'Last Modified At',
+  lastModifiedBy: 'Last Modified By',
+  lastProvisioningState: 'Last Provisioning State',
+  location: 'Location',
+  name: 'Name',
+  provisioningState: 'Provisioning State',
+  resourceId: 'Resource Id',
+  version: 'Version',
+  installStatus: 'Installation Status'
 }
 
-interface IClusterDetailComponentState {
-  item: IClusterDetails // why both state and props?
+const ShimmerStyle: Partial<IShimmerStyles> = {
+  root: {
+    margin: "11px 0"
+  }
 }
+
+const headShimmerStyle: Partial<IShimmerStyles> = {
+  root: {
+    margin: "15px 0"
+  }
+}
+
+const headerShimmer = [
+  { type: ShimmerElementType.line, height: 32, width: '25%' },
+]
+
+const rowShimmer = [
+  { type: ShimmerElementType.line, height: 18, width: '75%' },
+]
 
 const KeyColumnStyle: Partial<IStackStyles> = {
   root: {
@@ -70,12 +112,6 @@ function ClusterDetailCell(
     return <Stack.Item styles={value.style}>
       <Text styles={value.style} variant={'medium'}>{value.value}</Text>
     </Stack.Item>
-  } else {
-    value.style.paddingLeft += 40;
-    return Object.entries(value.value).map((innerValue: any, index: number) => (
-      <ClusterDetailCell style={value.style} value={innerValue[1]} />
-    )
-    )
   }
 };
 
@@ -86,55 +122,55 @@ export class ClusterDetailComponent extends Component<ClusterDetailComponentProp
   }
 
   public render() {
+    const headerEntries = Object.entries(clusterDetailHeadings)
     switch (this.props.detailPanelVisible) {
       case "Overview":
         {
-          const entries = Object.entries(this.props.item)
+          if (this.props.item.length != 0) {
 
           return (
             <Stack styles={contentStackStylesNormal}>
               <Text variant="xxLarge">{this.props.clusterName}</Text>
-              <Shimmer isDataLoaded={this.props.isDataLoaded} cols={3} rows={16}>
                 <Stack horizontal>
                   <Stack styles={KeyColumnStyle}>
-                    {entries.map((value: any, index: number) => (
-                      <ClusterDetailCell style={KeyStyle} key={index} value={value[0]} />
+                    {headerEntries.map((value: any, index: number) => (
+                      <ClusterDetailCell style={KeyStyle} key={index} value={value[1]} />
                     )
                     )}
                   </Stack>
 
                   <Stack styles={KeyColumnStyle}>
-                    {Array(entries.length).fill(':').map((value: any, index: number) => (
+                    {Array(headerEntries.length).fill(':').map((value: any, index: number) => (
                       <ClusterDetailCell style={KeyStyle} key={index} value={value} />
                     )
                     )}
                   </Stack>
 
                   <Stack styles={ValueColumnStyle}>
-                    {entries.map((value: [string, string | Object | null], index: number) => (
+                    {headerEntries.map((value: [any, any], index: number) => (
                       <ClusterDetailCell style={ValueStyle}
                         key={index}
-                        value={value[1] != null && value[1].toString().length > 0 ? value[1] : "Undefined"} />
-                    )
+                        value={this.props.item[value[0]] != null && this.props.item[value[0]].toString().length > 0 ? this.props.item[value[0]] : "Undefined"} />
+                      )
                     )}
                   </Stack>
                 </Stack>
-              </Shimmer>
             </Stack>
           );
+          } else {
+            return (
+              <Stack>
+                <Shimmer styles={headShimmerStyle} shimmerElements={headerShimmer} width="25%"></Shimmer>
+                {headerEntries.map(() => (
+                  <Shimmer styles={ShimmerStyle} shimmerElements={rowShimmer} width="75%"></Shimmer>
+                  )
+                )}
+              </Stack>
+            )
+          }
         } break;
       case "Nodes":
         {
-          const ClusterDetailCell = (
-            value: any,
-          ) => (
-            <Shimmer isDataLoaded={this.props.isDataLoaded}>
-              <Stack.Item styles={value.style}>
-                <Text styles={value.style} variant={'medium'}>{value.value}</Text>
-              </Stack.Item>
-            </Shimmer>
-          );
-          const entries = Object.entries(this.props.item)
           return (
             <Stack styles={contentStackStylesNormal}>
               <Text variant="xxLarge">{this.props.clusterName}</Text>
