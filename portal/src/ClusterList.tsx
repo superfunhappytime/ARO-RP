@@ -169,7 +169,7 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
         data: "string",
         isPadded: false,
         maxWidth: 24,
-        onRender: (item: ICluster) => (
+        onRender: () => (
           <Stack horizontal verticalAlign="center" className={classNames.iconContainer}>
             <img src="/favicon.ico" className={classNames.headerIcon} alt="" />
           </Stack>
@@ -312,16 +312,16 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
               <IconButton
                 iconProps={{ iconName: "BIDashboard" }}
                 aria-label="Prometheus"
-                href={item.name + `/prometheus`}
+                href={item.id + `/prometheus`}
               />
             </TooltipHost>
-            <TooltipHost content={`OpenShift Console`}>
+            {/* <TooltipHost content={`OpenShift Console`}>
               <IconButton
                 iconProps={{ iconName: "openshift-svg" }}
                 aria-label="Console"
                 href={item.consoleLink}
               />
-            </TooltipHost>
+            </TooltipHost> */}
             <TooltipHost content={`SSH`}>
               <IconButton
                 iconProps={{ iconName: "CommandPrompt" }}
@@ -330,14 +330,14 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
               />
             </TooltipHost>
             <KubeconfigButton clusterID={item.name} csrfToken={props.csrfToken} />
-            <TooltipHost content={`Geneva`}>
+            {/* <TooltipHost content={`Geneva`}>
               <IconButton
                 iconProps={{ iconName: "Health" }}
                 aria-label="Geneva"
                 href={item.name + `/geneva`}
               />
-            </TooltipHost>
-            <TooltipHost content={`Upgrade`}>
+            </TooltipHost> */}
+            {/* <TooltipHost content={`Upgrade`}>
               <IconButton
                 iconProps={{ iconName: "Up" }}
                 aria-label="upgrade"
@@ -350,7 +350,7 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
                 aria-label="featureFlags"
                 href={item.name + `/feature-flags`}
               />
-            </TooltipHost>
+            </TooltipHost> */}
           </Stack>
         ),
       },
