@@ -51,15 +51,7 @@ const headerTextStyles: ITextStyles = {
 export const contentStackStylesNormal: IStackStyles = {
   root: [
     {
-      padding: 10,
-    },
-  ],
-}
-
-const contentClusterListStylesNormal: IStackStyles = {
-  root: [
-    {
-      padding: 10,
+      padding: 20,
     },
   ],
 }
