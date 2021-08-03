@@ -33,16 +33,6 @@ const navLinkGroups: INavLinkGroup[] = [
       },
     ],
   },
-  {
-    links: [
-      {
-        name: 'Nodes',
-        key: 'nodes',
-        url: "#nodes",
-        icon: 'BuildQueue'
-      },
-    ],
-  },
 ];
 
 const customPanelStyle: Partial<IPanelStyles> = {
