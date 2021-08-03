@@ -201,6 +201,7 @@ function App() {
                 iconProps={{ iconName: "GlobalNavButton" }}
                 onClick={openPanel}
                 styles={MenuButtonStyles}
+                disabled
               />
             </Stack.Item>
             <Stack.Item grow>
