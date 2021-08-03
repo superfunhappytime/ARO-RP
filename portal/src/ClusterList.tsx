@@ -132,11 +132,21 @@ const clusterListDetailStyles: Partial<IDetailsListStyles> = {
   },
 }
 
+const clusterListDetailStylesSmall: Partial<IDetailsListStyles> = {
+  root: {
+    overflow: "hidden",
+  },
+  headerWrapper: {
+    marginTop: "-16px",
+  },
+}
+
 interface ClusterListComponentProps {
   items: ICluster[]
   sshModalRef: MutableRefObject<any>
   setCurrentCluster: any // TODO: fix this. help function reference. Any... probably bad
   csrfToken: MutableRefObject<string>
+  showColumns: Boolean
 }
 
 class ClusterListComponent extends Component<ClusterListComponentProps, IClusterListState> {
@@ -354,7 +364,13 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
   }
 
   public render() {
-    const { columns, items } = this.state
+    var { columns, items } = this.state
+    var myStyle = clusterListDetailStyles
+
+    if ( !this.props.showColumns ) {
+      columns = [columns[0], columns[1]]
+      myStyle = clusterListDetailStylesSmall
+    }
 
     return (
       <Stack>
@@ -371,7 +387,7 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
           layoutMode={DetailsListLayoutMode.fixedColumns}
           isHeaderVisible={true}
           onItemInvoked={this._onItemInvoked}
-          styles={clusterListDetailStyles}
+          styles={myStyle}
         />
       </Stack>
     )
@@ -433,6 +449,7 @@ export function ClusterList(props: {
   sshBox: MutableRefObject<any>
   setCurrentCluster: any // TODO: fix this. probably bad - this is a helper function..
   loaded: string
+  showColumns: Boolean
 }) {
   const [data, setData] = useState<any>([])
   const [error, setError] = useState<AxiosResponse | null>(null)
@@ -509,6 +526,7 @@ export function ClusterList(props: {
         sshModalRef={props.sshBox}
         setCurrentCluster={props.setCurrentCluster}
         csrfToken={props.csrfToken}
+        showColumns={props.showColumns}
       />
     </Stack>
   )

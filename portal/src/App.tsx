@@ -56,6 +56,14 @@ export const contentStackStylesNormal: IStackStyles = {
   ],
 }
 
+const contentClusterListStylesNormal: IStackStyles = {
+  root: [
+    {
+      padding: 10,
+    },
+  ],
+}
+
 const contentStackStylesSmall: IStackStyles = {
   root: [
     {
@@ -109,6 +117,7 @@ function App() {
   const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: ""} ) // TODO: probably not best practice ... nullable reference?
 
   const [contentStackStyles, setContentStackStyles] = useState<IStackStyles>(contentStackStylesNormal)
+  const [showColumns, setShowColumns] = useState<Boolean>(true)
   const sshRef = useRef<typeof SSHModal | null>(null)
   const csrfRef = useRef<string>("")
 
@@ -118,10 +127,12 @@ function App() {
     setCurrentCluster({ subscription: "", resource: "", clusterName: ""})
     setCurrentCluster(clusterDetail)
     setContentStackStyles(contentStackStylesSmall)
+    setShowColumns(false);
   }
 
   const _onCloseDetailPanel = () => {
     setContentStackStyles(contentStackStylesNormal)
+    setShowColumns(true);
   }
 
   useEffect(() => {
@@ -201,6 +212,7 @@ function App() {
                 iconProps={{ iconName: "GlobalNavButton" }}
                 onClick={openPanel}
                 styles={MenuButtonStyles}
+                disabled
               />
             </Stack.Item>
             <Stack.Item grow>
@@ -229,7 +241,7 @@ function App() {
         <Stack styles={contentStackStyles}>
           <Stack.Item grow>{error && errorBar()}</Stack.Item>
           <Stack.Item grow>
-            <ClusterList csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
+            <ClusterList showColumns={showColumns} csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
           </Stack.Item>
           <Stack.Item grow>
             <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} onClose={_onCloseDetailPanel}/>
