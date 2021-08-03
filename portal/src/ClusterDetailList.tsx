@@ -126,31 +126,37 @@ export class ClusterDetailComponent extends Component<ClusterDetailComponentProp
     switch (this.props.detailPanelVisible) {
       case "Overview":
         {
+          var filteredHeaders: Array<[string, any]> = []
           if (this.props.item.length != 0) {
-
+            headerEntries.filter((element: [string, any]) => {
+              if (this.props.item[element[0]] != null &&
+                  this.props.item[element[0]].toString().length > 0) {
+                    filteredHeaders.push(element)
+                  }
+            })
           return (
             <Stack styles={contentStackStylesNormal}>
               <Text variant="xxLarge">{this.props.clusterName}</Text>
                 <Stack horizontal>
                   <Stack styles={KeyColumnStyle}>
-                    {headerEntries.map((value: any, index: number) => (
+                    {filteredHeaders.map((value: [string, any], index: number) => (
                       <ClusterDetailCell style={KeyStyle} key={index} value={value[1]} />
                     )
                     )}
                   </Stack>
 
                   <Stack styles={KeyColumnStyle}>
-                    {Array(headerEntries.length).fill(':').map((value: any, index: number) => (
+                    {Array(filteredHeaders.length).fill(':').map((value: [string], index: number) => (
                       <ClusterDetailCell style={KeyStyle} key={index} value={value} />
                     )
                     )}
                   </Stack>
 
                   <Stack styles={ValueColumnStyle}>
-                    {headerEntries.map((value: [any, any], index: number) => (
+                    {filteredHeaders.map((value: [string, any], index: number) => (
                       <ClusterDetailCell style={ValueStyle}
                         key={index}
-                        value={this.props.item[value[0]] != null && this.props.item[value[0]].toString().length > 0 ? this.props.item[value[0]] : "Undefined"} />
+                        value={this.props.item[value[0]]} />
                       )
                     )}
                   </Stack>
