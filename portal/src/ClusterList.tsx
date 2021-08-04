@@ -190,7 +190,7 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
         onColumnClick: this._onColumnClick,
         data: "string",
         onRender: (item: ICluster) => (
-          <Link onClick={(_) => this._onClusterInfoLinkClick(item)} >
+          <Link onClick={(_) => this._onClusterInfoLinkClick(item)} href={"#" + item.id + "/overview"}>
             {item.name}
           </Link>
         ),
