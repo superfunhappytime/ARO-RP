@@ -27,6 +27,7 @@ import { SSHModal } from "./SSHModal"
 import { ClusterDetailPanel } from "./ClusterDetail"
 import { ClusterList } from "./ClusterList"
 import { FetchInfo, ProcessLogOut } from "./Request"
+import { useHistory } from 'react-router-dom'  
 
 const containerStackTokens: IStackTokens = {}
 const appStackTokens: IStackTokens = { childrenGap: 10 }
@@ -113,6 +114,8 @@ function App() {
   const sshRef = useRef<typeof SSHModal | null>(null)
   const csrfRef = useRef<string>("")
 
+  const history = useHistory()
+
   // _setCurrentCluster is a helper function to wrap app state
   // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
   const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
@@ -120,6 +123,7 @@ function App() {
     setCurrentCluster(clusterDetail)
     setContentStackStyles(contentStackStylesSmall)
     setShowColumns(false);
+    history.push(clusterDetail.clusterName)
   }
 
   const _onCloseDetailPanel = () => {
