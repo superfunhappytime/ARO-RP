@@ -329,7 +329,7 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
                 onClick={(_) => this._onSSHClick(item)}
               />
             </TooltipHost>
-            <KubeconfigButton clusterID={item.name} csrfToken={props.csrfToken} />
+            <KubeconfigButton clusterID={item.id} csrfToken={props.csrfToken} />
             {/* <TooltipHost content={`Geneva`}>
               <IconButton
                 iconProps={{ iconName: "Health" }}
@@ -411,12 +411,12 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
   private _onSSHClick(item: any): void {
     const modal = this._sshModal
     if (modal && modal.current) {
-      modal.current.LoadSSH(item.name)
+      modal.current.LoadSSH(item.id)
     }
   }
 
-  private _onClusterInfoLinkClick(item: any): void { // TODO: item ---- should not be any, create an interface or something.
-    const thisCluster: IClusterDetail = {clusterName: item.name, subscription: item.subscription, resource: item.resourceGroup}
+  private _onClusterInfoLinkClick(item: ICluster): void { // TODO: item ---- should not be any, create an interface or something.
+    const thisCluster: IClusterDetail = {clusterName: item.name, subscription: item.subscription, resource: item.resourceGroup, resourceId: item.id}
     this._setCurrentCluster(thisCluster)
   }
 

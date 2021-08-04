@@ -27,7 +27,7 @@ import { SSHModal } from "./SSHModal"
 import { ClusterDetailPanel } from "./ClusterDetail"
 import { ClusterList } from "./ClusterList"
 import { FetchInfo, ProcessLogOut } from "./Request"
-import { useHistory } from 'react-router-dom'  
+import { useHistory, withRouter, BrowserRouter} from 'react-router-dom'
 
 const containerStackTokens: IStackTokens = {}
 const appStackTokens: IStackTokens = { childrenGap: 10 }
@@ -100,6 +100,7 @@ export interface IClusterDetail {
   subscription: string,
   resource: string,
   clusterName: string,
+  resourceId: string
 }
 
 function App() {
@@ -107,7 +108,7 @@ function App() {
   const [error, setError] = useState<AxiosResponse | null>(null)
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
   const [fetching, setFetching] = useState("")
-  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: ""} ) // TODO: probably not best practice ... nullable reference?
+  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: "", resourceId: ""} ) // TODO: probably not best practice ... nullable reference?
 
   const [contentStackStyles, setContentStackStyles] = useState<IStackStyles>(contentStackStylesNormal)
   const [showColumns, setShowColumns] = useState<Boolean>(true)
@@ -119,11 +120,11 @@ function App() {
   // _setCurrentCluster is a helper function to wrap app state
   // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
   const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
-    setCurrentCluster({ subscription: "", resource: "", clusterName: ""})
+    setCurrentCluster({ subscription: "", resource: "", clusterName: "", resourceId: ""})
     setCurrentCluster(clusterDetail)
     setContentStackStyles(contentStackStylesSmall)
     setShowColumns(false);
-    history.push(clusterDetail.clusterName)
+    history.push(clusterDetail.resourceId)
   }
 
   const _onCloseDetailPanel = () => {
@@ -249,4 +250,4 @@ function App() {
   )
 }
 
-export default App
+export default withRouter(App)
