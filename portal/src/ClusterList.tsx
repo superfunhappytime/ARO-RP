@@ -415,8 +415,8 @@ class ClusterListComponent extends Component<ClusterListComponentProps, ICluster
     }
   }
 
-  private _onClusterInfoLinkClick(item: any): void { // TODO: item ---- should not be any, create an interface or something.
-    const thisCluster: IClusterDetail = {clusterName: item.name, subscription: item.subscription, resource: item.resourceGroup}
+  private _onClusterInfoLinkClick(item: ICluster): void { // TODO: item ---- should not be any, create an interface or something.
+    const thisCluster: IClusterDetail = {clusterName: item.name, subscription: item.subscription, resource: item.resourceGroup, resourceId: item.id}
     this._setCurrentCluster(thisCluster)
   }
 
