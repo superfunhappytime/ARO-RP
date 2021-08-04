@@ -7,6 +7,8 @@ import { FetchClusterInfo } from './Request';
 import { IClusterDetail, contentStackStylesNormal } from "./App"
 import { Nav, INavLink, INavLinkGroup, INavStyles } from '@fluentui/react/lib/Nav';
 import { ClusterDetailComponent } from './ClusterDetailList'
+import { useHistory } from "react-router-dom"
+
 
 const navStyles: Partial<INavStyles> = {
   root: {
@@ -21,19 +23,6 @@ const navStyles: Partial<INavStyles> = {
     marginBottom: "0px"
   }
 };
-
-const navLinkGroups: INavLinkGroup[] = [
-  {
-    links: [
-      {
-        name: 'Overview',
-        key: 'overview',
-        url: "#overview",
-        icon: 'ThisPC',
-      },
-    ],
-  },
-];
 
 const customPanelStyle: Partial<IPanelStyles> = {
   root: { top: "40px", left: "225px" },
@@ -126,6 +115,21 @@ export function ClusterDetailPanel(props: {
     }
   }
 
+  const history = useHistory();
+
+  var navLinkGroups = [
+    {
+      links: [
+        {
+          name: 'Overview',
+          key: 'overview',
+          url: '#' + history.location.pathname + "/overview",
+          icon: 'ThisPC',
+        },
+      ],
+    },
+  ];
+
   // TODO: props.loaded rename to CSRFTokenAvailable
   return (
     <Panel
@@ -146,6 +150,7 @@ export function ClusterDetailPanel(props: {
               ariaLabel="Select a tab to view"
               styles={navStyles}
               groups={navLinkGroups}
+              initialSelectedKey={"overview"}
             />
           </Stack.Item>
           <Separator vertical />

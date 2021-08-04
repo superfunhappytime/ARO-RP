@@ -130,6 +130,7 @@ function App() {
   const _onCloseDetailPanel = () => {
     setContentStackStyles(contentStackStylesNormal)
     setShowColumns(true);
+    history.goBack();
   }
 
   useEffect(() => {
