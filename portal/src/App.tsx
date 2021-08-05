@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, EffectCallback } from "react"
 import {
   Stack,
   Text,
@@ -27,7 +27,7 @@ import { SSHModal } from "./SSHModal"
 import { ClusterDetailPanel } from "./ClusterDetail"
 import { ClusterList } from "./ClusterList"
 import { FetchInfo, ProcessLogOut } from "./Request"
-import { useHistory, withRouter, BrowserRouter} from 'react-router-dom'
+import { useHistory, withRouter, BrowserRouter } from 'react-router-dom'
 
 const containerStackTokens: IStackTokens = {}
 const appStackTokens: IStackTokens = { childrenGap: 10 }
@@ -103,12 +103,21 @@ export interface IClusterDetail {
   resourceId: string
 }
 
+export const clusterRegex: RegExp = /^\/subscriptions\/(.*)\/resourceGroups\/(.*)\/providers\/Microsoft\.RedHatOpenShift\/openShiftClusters\/(.*)\/(\w+)/;
+
+export function checkRoute(history: string) {
+  console.log(history);
+  var output = clusterRegex.exec(history)
+
+  return output;
+}
+
 function App() {
   const [data, updateData] = useState({ location: "", csrf: "", elevated: false, username: "" })
   const [error, setError] = useState<AxiosResponse | null>(null)
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
   const [fetching, setFetching] = useState("")
-  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>( { subscription: "", resource: "", clusterName: "", resourceId: ""} ) // TODO: probably not best practice ... nullable reference?
+  const [currentCluster, setCurrentCluster] = useState<IClusterDetail>({ subscription: "", resource: "", clusterName: "", resourceId: "" }) // TODO: probably not best practice ... nullable reference?
 
   const [contentStackStyles, setContentStackStyles] = useState<IStackStyles>(contentStackStylesNormal)
   const [showColumns, setShowColumns] = useState<Boolean>(true)
@@ -120,7 +129,6 @@ function App() {
   // _setCurrentCluster is a helper function to wrap app state
   // TODO: can we just pass in setCurrentCluster rather then _setCurrentCluster?
   const _setCurrentCluster = (clusterDetail: IClusterDetail) => {
-    setCurrentCluster({ subscription: "", resource: "", clusterName: "", resourceId: ""})
     setCurrentCluster(clusterDetail)
     setContentStackStyles(contentStackStylesSmall)
     setShowColumns(false);
@@ -130,7 +138,7 @@ function App() {
   const _onCloseDetailPanel = () => {
     setContentStackStyles(contentStackStylesNormal)
     setShowColumns(true);
-    history.goBack();
+    history.replace("")
   }
 
   useEffect(() => {
@@ -149,6 +157,14 @@ function App() {
       FetchInfo().then(onData)
     }
   }, [fetching, error, data])
+
+  useEffect(() => {
+    var routeObjs = checkRoute(history.location.pathname)
+    if (routeObjs != null) {
+
+    }
+    console.log(routeObjs);
+  }, [])
 
   const onRenderNavigationContent: IRenderFunction<IPanelProps> = useCallback(
     (props, defaultRender) => (
@@ -177,7 +193,7 @@ function App() {
       </MessageBar>
     )
   }
-  
+
   // Application state maintains the current resource id/name/group
   // when we click a thing set the state
   // ...
@@ -242,7 +258,7 @@ function App() {
             <ClusterList showColumns={showColumns} csrfToken={csrfRef} sshBox={sshRef} setCurrentCluster={_setCurrentCluster} loaded={fetching} />
           </Stack.Item>
           <Stack.Item grow>
-            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} onClose={_onCloseDetailPanel}/>
+            <ClusterDetailPanel csrfToken={csrfRef} loaded={fetching} currentCluster={currentCluster} onClose={_onCloseDetailPanel} />
           </Stack.Item>
         </Stack>
         <SSHModal csrfToken={csrfRef} ref={sshRef} />
