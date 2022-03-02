@@ -89,3 +89,11 @@ jobs:
       failIfCoverageEmpty: false
     condition: succeededOrFailed()
 
+- job: Lint_Admin_Portal
+  pool:
+    name: ARO-CI
+  steps:
+  - script: | 
+      podman build -f Dockerfile.portal_lint . -t linter
+      podman run -it --rm localhost/linter .
+    displayName: 🧹 Lint Admin Portal 
