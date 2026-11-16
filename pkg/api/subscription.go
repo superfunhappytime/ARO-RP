@@ -3,7 +3,28 @@ package api
 // Copyright (c) Microsoft Corporation.
 // Licensed under the Apache License 2.0.
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
+
+// physicalZoneRegexp matches an optional "<region>-az" prefix, optional
+// zero-padding, then the zone number.
+var physicalZoneRegexp = regexp.MustCompile(`(?i)^(?:.*-az)?0*(\d+)$`)
+
+// normalizePhysicalZone converts an Azure physical availability zone from any
+// known format into the bare numeric form the zone-override config uses.
+//
+//	"2"              -> "2"   (already bare)
+//	"eastus-az1"     -> "1"   (lowercase, region-prefixed)
+//	"uscentral-AZ02" -> "2"   (uppercase, zero-padded)
+func normalizePhysicalZone(physicalZone string) (string, error) {
+	m := physicalZoneRegexp.FindStringSubmatch(physicalZone)
+	if m == nil {
+		return "", fmt.Errorf("unrecognised physical zone format: %q", physicalZone)
+	}
+	return m[1], nil
+}
 
 // Subscription represents a subscription
 type Subscription struct {
@@ -54,9 +75,18 @@ func (f *SubscriptionProperties) MapPhysicalZonesToLogicalZonesForSubscription(l
 	for _, physicalZone := range physicalZones {
 		foundLogicalZone := false
 
+		want, err := normalizePhysicalZone(physicalZone)
+		if err != nil {
+			return nil, err
+		}
+
 		// for _, zoneMapping := range zoneProfile.ZoneMappings {
 		for _, zoneMapping := range f.AvailabilityZones.ZoneMappings {
-			if physicalZone == zoneMapping.PhysicalZone {
+			got, err := normalizePhysicalZone(zoneMapping.PhysicalZone)
+			if err != nil {
+				return nil, err
+			}
+			if want == got {
 				logicalZones = append(logicalZones, zoneMapping.LogicalZone)
 				foundLogicalZone = true
 				break
