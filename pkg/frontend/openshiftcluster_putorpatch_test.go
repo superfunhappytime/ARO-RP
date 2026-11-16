@@ -717,23 +717,6 @@ func TestPutorPatchOpenShiftClusterCreate(t *testing.T) {
 					Name:  api.FeatureFlagOverrideClusterDeploymentZones,
 					State: "Registered",
 				})
-				sub.Subscription.Properties.AvailabilityZones = &api.AvailabilityZonesProfile{
-					Location: "eastus",
-					ZoneMappings: []api.AvailabilityZoneMapping{
-						{
-							PhysicalZone: "1",
-							LogicalZone:  "2",
-						},
-						{
-							PhysicalZone: "2",
-							LogicalZone:  "3",
-						},
-						{
-							PhysicalZone: "3",
-							LogicalZone:  "1",
-						},
-					},
-				}
 
 				f.AddSubscriptionDocuments(sub)
 			},
@@ -743,7 +726,7 @@ func TestPutorPatchOpenShiftClusterCreate(t *testing.T) {
 				checker.AddAsyncOperationDocuments(getAsynchronousOperationDocument(api.ProvisioningStateCreating, api.ProvisioningStateCreating))
 
 				doc := getServicePrincipalOpenShiftClusterDocument(api.ProvisioningStateCreating, "", "")
-				doc.OpenShiftCluster.Properties.Zones = []string{"2", "3", "1"}
+				doc.OpenShiftCluster.Properties.Zones = []string{"1", "2", "3"}
 
 				checker.AddOpenShiftClusterDocuments(doc)
 			},
@@ -765,23 +748,6 @@ func TestPutorPatchOpenShiftClusterCreate(t *testing.T) {
 					Name:  api.FeatureFlagOverrideClusterDeploymentZones,
 					State: "Registered",
 				})
-				sub.Subscription.Properties.AvailabilityZones = &api.AvailabilityZonesProfile{
-					Location: "eastus",
-					ZoneMappings: []api.AvailabilityZoneMapping{
-						{
-							PhysicalZone: "1",
-							LogicalZone:  "2",
-						},
-						{
-							PhysicalZone: "2",
-							LogicalZone:  "3",
-						},
-						{
-							PhysicalZone: "3",
-							LogicalZone:  "1",
-						},
-					},
-				}
 
 				f.AddSubscriptionDocuments(sub)
 			},
@@ -793,28 +759,6 @@ func TestPutorPatchOpenShiftClusterCreate(t *testing.T) {
 			},
 			wantStatusCode: http.StatusCreated,
 			wantResponse:   getNewServicePrincipalOpenShiftClusterResponse(),
-		},
-		{
-			name: "create a new OpenShift Service Principal cluster - overridden zones but mapping failure",
-			request: func() *v20250725.OpenShiftCluster {
-				return getServicePrincipalOpenShiftClusterRequest()
-			},
-			mocks: func(mi *mock_env.MockInterface) {
-				// set in the env during runtime
-				mi.EXPECT().OverrideClusterDeploymentZonesOnOptIn().Return([]string{"1", "2", "3"})
-			},
-			fixture: func(f *testdatabase.Fixture) {
-				sub := newMockSubscriptionDocument()
-				sub.Subscription.Properties.RegisteredFeatures = append(sub.Subscription.Properties.RegisteredFeatures, api.RegisteredFeatureProfile{
-					Name:  api.FeatureFlagOverrideClusterDeploymentZones,
-					State: "Registered",
-				})
-
-				f.AddSubscriptionDocuments(sub)
-			},
-			// do we want to expose this to the user?
-			wantStatusCode: http.StatusInternalServerError,
-			wantError:      "500: InternalServerError: : Internal server error.",
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {

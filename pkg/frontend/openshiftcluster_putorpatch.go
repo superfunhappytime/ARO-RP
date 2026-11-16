@@ -260,19 +260,17 @@ func (f *frontend) _putOrPatchOpenShiftCluster(ctx context.Context, log *logrus.
 
 		// If the subscription has the relevant feature flag and the zones are
 		// not set directly (e.g. via the API) overwrite the default cluster
-		// zones with the ones in the environment
+		// zones with the ones configured in the environment. The configured
+		// zones are logical availability zones, used as-is: this pins the
+		// subscription to a consistent zone selection without needing a
+		// physical-to-logical zone mapping from ARM.
 		if feature.IsRegisteredForFeature(subscription.Subscription.Properties, api.FeatureFlagOverrideClusterDeploymentZones) &&
 			doc.OpenShiftCluster.Properties.Zones == nil {
-			overrideZones := f.env.OverrideClusterDeploymentZonesOnOptIn()
+			overrideZones := f.env.OverrideClusterDeploymentZonesOnOptIn() // "1,2,3" or "1" or "nonzonal" OR nil (default behavior)
 			// if != nil we have an override set in the env
 			if overrideZones != nil {
 				log.Infof("feature '%s' set on subscription, overriding zones to %v", api.FeatureFlagOverrideClusterDeploymentZones, overrideZones)
-
-				logicalZonesForSub, err := subscription.Subscription.Properties.MapPhysicalZonesToLogicalZonesForSubscription(f.env.Location(), overrideZones)
-				if err != nil {
-					return nil, err
-				}
-				doc.OpenShiftCluster.Properties.Zones = logicalZonesForSub
+				doc.OpenShiftCluster.Properties.Zones = overrideZones
 			}
 		}
 
